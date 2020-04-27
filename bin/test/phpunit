@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -eu
+
+readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+outputRedirect="/tmp/php-object.test.phpunit.log"
+
+function onError() {
+    if [ -f "${outputRedirect}" ]; then
+        cat "${outputRedirect}"
+    fi
+
+    removeOutputRedirectFile
+    echo -e "\e[41m Error while testing with PHPUnit. \e[0m"
+}
+
+
+function removeOutputRedirectFile() {
+    if [ -f "${outputRedirect}" ]; then
+        rm "${outputRedirect}"
+    fi
+}
+
+trap onError ERR
+
+verbosityLevel=0
+for param in "$@"; do
+    if [ "$param" == "-v" ]; then
+        verbosityLevel=1
+    elif [ "$param" == "-vv" ]; then
+        verbosityLevel=2
+    elif [ "$param" == "-vvv" ]; then
+        verbosityLevel=3
+    fi
+done
+
+if [ ${verbosityLevel} -ge 1 ]; then
+    outputRedirect="/proc/self/fd/0"
+fi
+
+echo -e "PHPunit with \e[32mPHP 7.1\e[0m."
+${rootDirectory}/bin/test/phpunit71 > ${outputRedirect} 2>&1
+
+echo -e "PHPunit with \e[32mPHP 7.2\e[0m."
+${rootDirectory}/bin/test/phpunit72 > ${outputRedirect} 2>&1
+
+echo -e "PHPunit with \e[32mPHP 7.3\e[0m."
+${rootDirectory}/bin/test/phpunit73 > ${outputRedirect} 2>&1
+
+echo -e "PHPunit with \e[32mPHP 7.4\e[0m."
+${rootDirectory}/bin/test/phpunit74 > ${outputRedirect} 2>&1

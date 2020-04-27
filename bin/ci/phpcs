@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+set -eu
+
+readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+
+if [ $(which docker || false) ]; then
+    docker \
+        run \
+        -it \
+        --rm \
+        -v ${rootDirectory}:/app:ro \
+        --entrypoint /app/bin/ci/phpcs \
+        steevanb/php-code-sniffs:4.0.1
+else
+    readonly phpcsIgnore="--ignore=/app/vendor/"
+    PHPCS_PARAMETERS="-p --warning-severity=0 ${phpcsIgnore}"
+
+    if [ -f "${rootDirectory}/phpcs.bootstrap.local.php" ]; then
+        PHPCS_BOOTSTRAP="/app/phpcs.bootstrap.local.php"
+    fi
+
+    /var/php-code-sniffs/docker/entrypoint.sh
+fi

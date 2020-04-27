@@ -1,0 +1,126 @@
+version: '2.1'
+
+jobs:
+    composer:
+        docker:
+            - image: composer
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                name: Install Composer dependencies
+                command:
+                    composer install --ignore-platform-reqs --no-interaction
+            - save_cache:
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+                paths:
+                    - vendor
+
+    composerRequireChecker:
+        docker:
+            - image: steevanb/composer-require-checker:2.1.0
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                name: composer-require-checker
+                command: bin/ci/composerRequireChecker
+
+    phpcs:
+        docker:
+            - image: steevanb/php-code-sniffs:4.0.1
+        working_directory: /app
+        steps:
+            - checkout
+            - run:
+                name: phpcs
+                command: bin/ci/phpcs
+
+    phpstan:
+        docker:
+            - image: php:7.4-cli-alpine3.10
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                name: phpstan
+                command: bin/ci/phpstan
+
+    phpunit_php71:
+        docker:
+            - image: phpobject/core:phpunit-php71
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                name: PHPUnit with PHP 7.1.0
+                command: bin/test/phpunit71
+
+    phpunit_php72:
+        docker:
+            - image: phpobject/core:phpunit-php72
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                  name: PHPUnit with PHP 7.2.0
+                  command: bin/test/phpunit72
+
+    phpunit_php73:
+        docker:
+            - image: phpobject/core:phpunit-php73
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                  name: PHPUnit with PHP 7.3.0
+                  command: bin/test/phpunit73
+
+    phpunit_php74:
+        docker:
+            - image: phpobject/core:phpunit-php74
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
+            - run:
+                  name: PHPUnit with PHP 7.4.0
+                  command: bin/test/phpunit74
+
+workflows:
+    version: '2.1'
+    CI:
+        jobs:
+            - phpcs
+            - composer
+            - composerRequireChecker:
+                requires:
+                    - composer
+            - phpstan:
+                requires:
+                    - composer
+            - phpunit_php71:
+                requires:
+                    - composer
+            - phpunit_php72:
+                requires:
+                    - composer
+            - phpunit_php73:
+                requires:
+                    - composer
+            - phpunit_php74:
+                requires:
+                    - composer

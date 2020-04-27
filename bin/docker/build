@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+set -eu
+
+readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+readonly dockerImagePhpUnitPhp71="phpobject/core:phpunit-php71"
+readonly dockerImagePhpUnitPhp72="phpobject/core:phpunit-php72"
+readonly dockerImagePhpUnitPhp73="phpobject/core:phpunit-php73"
+readonly dockerImagePhpUnitPhp74="phpobject/core:phpunit-php74"
+outputRedirect="/tmp/php-object.docker.build.log"
+
+function onError() {
+    if [ -f "${outputRedirect}" ]; then
+        cat "${outputRedirect}"
+    fi
+
+    removeOutputRedirectFile
+    echo -e "\e[41m Error while building Docker images. \e[0m"
+}
+
+
+function removeOutputRedirectFile() {
+    if [ -f "${outputRedirect}" ]; then
+        rm "${outputRedirect}"
+    fi
+}
+
+trap onError ERR
+
+function buildPhpUnitImage() {
+    trap onError ERR
+
+    local phpVersion="${1}"
+    local dockerFileExtension="${2}"
+    local dockerImageTag="${3}"
+
+    echo -e "Build Docker image \e[32m${dockerImageTag}\e[0m."
+    docker \
+        build \
+        --force-rm \
+        --tag ${dockerImageTag} \
+        --file ${rootDirectory}/docker/phpunit/Dockerfile.${dockerFileExtension} \
+        ${dockerQuietParam} \
+        ${dockerNoCacheParam} \
+        . \
+        > ${outputRedirect} 2>&1
+}
+
+removeOutputRedirectFile
+
+verbosityLevel=0
+verboseParam=""
+dockerNoCacheParam=""
+pushDockerImages=false
+for param in "$@"; do
+    if [ "$param" == "-v" ]; then
+        verbosityLevel=1
+    elif [ "$param" == "-vv" ]; then
+        verbosityLevel=2
+    elif [ "$param" == "-vvv" ]; then
+        verbosityLevel=3
+    elif [ "$param" == "--refresh" ]; then
+        dockerNoCacheParam="--no-cache --pull"
+    elif [ "$param" == "--push" ]; then
+        pushDockerImages=true
+    fi
+done
+
+if [ ${verbosityLevel} -ge 1 ]; then
+    outputRedirect="/proc/self/fd/0"
+    dockerQuietParam=""
+else
+    dockerQuietParam="--quiet"
+fi
+
+buildPhpUnitImage "7.1" "php71" "${dockerImagePhpUnitPhp71}"
+buildPhpUnitImage "7.2" "php72" "${dockerImagePhpUnitPhp72}"
+buildPhpUnitImage "7.3" "php73" "${dockerImagePhpUnitPhp73}"
+buildPhpUnitImage "7.4" "php74" "${dockerImagePhpUnitPhp74}"
+
+if [ ${pushDockerImages} == true ]; then
+    echo -e "Login to \e[32mdockerhub\e[0m."
+    docker logout > ${outputRedirect} 2>&1
+    docker login --username=phpobject
+
+    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp71}\e[0m to \e[32mdockerhub\e[0m."
+    docker push "${dockerImagePhpUnitPhp71}" > ${outputRedirect} 2>&1
+
+    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp72}\e[0m to \e[32mdockerhub\e[0m."
+    docker push "${dockerImagePhpUnitPhp72}" > ${outputRedirect} 2>&1
+
+    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp73}\e[0m to \e[32mdockerhub\e[0m."
+    docker push "${dockerImagePhpUnitPhp73}" > ${outputRedirect} 2>&1
+
+    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp74}\e[0m to \e[32mdockerhub\e[0m."
+    docker push "${dockerImagePhpUnitPhp74}" > ${outputRedirect} 2>&1
+fi
+
+removeOutputRedirectFile

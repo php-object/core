@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+set -eu
+
+readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+
+if [ $(which docker || false) ]; then
+    docker run \
+        --rm \
+        -it \
+        -v ${rootDirectory}:/app \
+        -w /app \
+        php:7.4-cli-alpine3.10 \
+        bin/ci/phpstan
+else
+    php -d memory_limit=512M /app/vendor/bin/phpstan analyse --ansi
+fi
