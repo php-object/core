@@ -1,0 +1,18 @@
+{
+    "name": "php-object/core",
+    "description": "Object model for PHP core functions",
+    "license": "MIT",
+    "require": {
+        "php": "^7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhpObject\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "7.5.*",
+        "phpstan/phpstan": "0.12.*",
+        "phpstan/phpstan-strict-rules": "0.12.*"
+    }
+}
