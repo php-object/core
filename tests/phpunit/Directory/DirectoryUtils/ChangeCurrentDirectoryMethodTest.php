@@ -10,13 +10,13 @@ use PhpObject\{
     Tests\PhpUnit\AbstractPhpObjectTestCase
 };
 
-final class ChangeMethodTest extends AbstractPhpObjectTestCase
+final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
 {
     public function testExistingDirectory(): void
     {
-        DirectoryUtils::change(sys_get_temp_dir());
-
-        static::addToAssertionCount(1);
+        DirectoryUtils::changeCurrentDirectory(sys_get_temp_dir());
+        $this->addToAssertionCount(1);
+        DirectoryUtils::changeCurrentDirectory(__DIR__ . '/../../..');
     }
 
     public function testDirectoryNotFound(): void
@@ -27,7 +27,7 @@ final class ChangeMethodTest extends AbstractPhpObjectTestCase
         static::expectExceptionMessage("Directory \"$directory\" not found.");
         static::expectExceptionCode(0);
 
-        DirectoryUtils::change($directory);
+        DirectoryUtils::changeCurrentDirectory($directory);
     }
 
     public function testPhpError(): void
@@ -35,14 +35,14 @@ final class ChangeMethodTest extends AbstractPhpObjectTestCase
         $this->enableTestErrorHandler();
 
         try {
-            DirectoryUtils::change('/fifou');
+            DirectoryUtils::changeCurrentDirectory('/fifou');
         } catch (DirectoryNotFoundException $exception) {
             // Nothing to do there
         }
 
         $this->disableTestErrorHandler();
 
-        static::assertLastError(
+        static::assertLastPhpError(
             $this->lastError,
             E_WARNING,
             'chdir(): No such file or directory (errno 2)',

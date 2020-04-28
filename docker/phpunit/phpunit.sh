@@ -2,4 +2,4 @@
 
 set -eu
 
-/app/vendor/bin/phpunit /app/tests/phpunit $@
+/app/vendor/bin/phpunit /app/tests/phpunit ${PHPUNIT_PARAMETERS}

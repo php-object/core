@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractPhpObjectTestCase extends TestCase
 {
-    public static function assertLastError(
+    public static function assertLastPhpError(
         array $lastError,
         int $number,
         string $error,
@@ -17,19 +17,28 @@ abstract class AbstractPhpObjectTestCase extends TestCase
         int $line = null
     ): void {
         if (count($lastError) === 0) {
-            static::fail('No PHP error was triggered.');
+            static::fail('No PHP error was triggered but "' . $error . '" is expected.');
         }
 
-        static::assertEquals($number, $lastError['number']);
-        static::assertEquals($error, $lastError['error']);
-        static::assertEquals($file, $lastError['file']);
-        static::assertEquals($line, $lastError['line']);
+        static::assertEquals($number, $lastError['number'] ?? null);
+        static::assertEquals($error, $lastError['error'] ?? null);
+        static::assertEquals($file, $lastError['file'] ?? null);
+        static::assertEquals($line, $lastError['line'] ?? null);
+    }
+
+    public static function assertNoPhpError(array $lastError): void
+    {
+        static::assertCount(
+            0,
+            $lastError,
+            'PHP error "' . ($lastError['error'] ?? null) . '" has been triggered but no one expected.'
+        );
     }
 
     /** @var array */
     protected $lastError = [];
 
-    public function setLastError(int $number, string $error, string $file = null, int $line = null): self
+    public function setLastPhpError(int $number, string $error, string $file = null, int $line = null): self
     {
         $this->lastError = [
             'number' => $number,
@@ -41,7 +50,7 @@ abstract class AbstractPhpObjectTestCase extends TestCase
         return $this;
     }
 
-    protected function getLastError(): array
+    protected function getLastPhpError(): array
     {
         return $this->lastError;
     }
