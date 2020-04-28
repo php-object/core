@@ -2,16 +2,18 @@
 
 set -eu
 
-readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
-
 if [ $(which docker || false) ]; then
+    readonly rootDirectory="$(realpath $(dirname $(realpath $0))/../..)"
+    readonly phpunitParameters="$@"
+
     docker \
         run \
         -it \
         --rm \
         -v ${rootDirectory}:/app:ro \
         --entrypoint /app/bin/test/phpunit71 \
+        --env PHPUNIT_PARAMETERS="${phpunitParameters}" \
         phpobject/core:phpunit-php71
 else
-    phpunit
+    phpunit ${PHPUNIT_PARAMETERS}
 fi

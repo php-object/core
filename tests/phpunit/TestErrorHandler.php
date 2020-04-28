@@ -26,6 +26,6 @@ class TestErrorHandler
         string $file = null,
         int $line = null
     ): void {
-        static::$testCase->setLastError($number, $error, $file, $line);
+        static::$testCase->setLastPhpError($number, $error, $file, $line);
     }
 }
