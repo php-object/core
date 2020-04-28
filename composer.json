@@ -7,7 +7,12 @@
     },
     "autoload": {
         "psr-4": {
-            "PhpObject\\": "src/"
+            "PhpObject\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhpObject\\Tests\\PhpUnit\\": "tests/phpunit"
         }
     },
     "require-dev": {
