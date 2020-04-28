@@ -11,14 +11,10 @@ if [ $(which docker || false) ]; then
         --rm \
         -v ${rootDirectory}:/app:ro \
         --entrypoint /app/bin/ci/phpcs \
-        steevanb/php-code-sniffs:4.0.1
+        steevanb/php-code-sniffs:4.0.2
 else
-    readonly phpcsIgnore="--ignore=/app/vendor/"
-    PHPCS_PARAMETERS="-p --warning-severity=0 ${phpcsIgnore}"
-
-    if [ -f "${rootDirectory}/phpcs.bootstrap.local.php" ]; then
-        PHPCS_BOOTSTRAP="/app/phpcs.bootstrap.local.php"
-    fi
+    PHPCS_PARAMETERS="-p --warning-severity=0 --ignore=/app/vendor/"
+    PHPCS_BOOTSTRAP="/app/phpcs.bootstrap.php"
 
     /var/php-code-sniffs/docker/entrypoint.sh
 fi

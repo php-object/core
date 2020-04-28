@@ -6,11 +6,11 @@ namespace phpunit\Directory\DirectoryUtils;
 
 use PhpObject\{
     Directory\DirectoryUtils,
-    Exception\Directory\DirectoryNotFoundException
+    Exception\Directory\DirectoryNotFoundException,
+    Tests\PhpUnit\AbstractPhpObjectTestCase
 };
-use PHPUnit\Framework\TestCase;
 
-final class ChangeMethodTest extends TestCase
+final class ChangeMethodTest extends AbstractPhpObjectTestCase
 {
     public function testExistingDirectory(): void
     {
@@ -28,5 +28,28 @@ final class ChangeMethodTest extends TestCase
         static::expectExceptionCode(0);
 
         DirectoryUtils::change($directory);
+    }
+
+    public function testPhpError(): void
+    {
+        $this->enableTestErrorHandler();
+
+        try {
+            DirectoryUtils::change('/fifou');
+        } catch (DirectoryNotFoundException $exception) {
+            // Nothing to do there
+        }
+
+        $this->disableTestErrorHandler();
+
+        static::assertLastError(
+            $this->lastError,
+            E_WARNING,
+            'chdir(): No such file or directory (errno 2)',
+            '/app/src/Directory/DirectoryUtils.php',
+            19
+        );
+
+        $this->resetLastError();
     }
 }
