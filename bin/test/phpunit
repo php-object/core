@@ -14,7 +14,6 @@ function onError() {
     echo -e "\e[41m Error while testing with PHPUnit. \e[0m"
 }
 
-
 function removeOutputRedirectFile() {
     if [ -f "${outputRedirect}" ]; then
         rm "${outputRedirect}"
@@ -38,14 +37,14 @@ if [ ${verbosityLevel} -ge 1 ]; then
     outputRedirect="/proc/self/fd/0"
 fi
 
-echo -e "PHPunit with \e[32mPHP 7.1\e[0m."
-${rootDirectory}/bin/test/phpunit71 > ${outputRedirect} 2>&1
+echo -e "PHPUnit with \e[32mPHP 7.1\e[0m."
+${rootDirectory}/bin/test/phpunit-php-7-1 > ${outputRedirect} 2>&1
 
-echo -e "PHPunit with \e[32mPHP 7.2\e[0m."
-${rootDirectory}/bin/test/phpunit72 > ${outputRedirect} 2>&1
+echo -e "PHPUnit with \e[32mPHP 7.2\e[0m."
+${rootDirectory}/bin/test/phpunit-php-7-2 > ${outputRedirect} 2>&1
 
-echo -e "PHPunit with \e[32mPHP 7.3\e[0m."
-${rootDirectory}/bin/test/phpunit73 > ${outputRedirect} 2>&1
+echo -e "PHPUnit with \e[32mPHP 7.3\e[0m."
+${rootDirectory}/bin/test/phpunit-php-7-3 > ${outputRedirect} 2>&1
 
-echo -e "PHPunit with \e[32mPHP 7.4\e[0m."
-${rootDirectory}/bin/test/phpunit74 > ${outputRedirect} 2>&1
+echo -e "PHPUnit with \e[32mPHP 7.4\e[0m."
+${rootDirectory}/bin/test/phpunit-php-7-4 > ${outputRedirect} 2>&1

@@ -1,17 +1,50 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -eu
 
 readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+outputRedirect="/tmp/php-object.ci.phpstan.log"
 
-if [ $(which docker || false) ]; then
-    docker run \
-        --rm \
-        -it \
-        -v ${rootDirectory}:/app \
-        -w /app \
-        php:7.4-cli-alpine3.10 \
-        bin/ci/phpstan
-else
-    php -d memory_limit=512M /app/vendor/bin/phpstan analyse --ansi
+function onError() {
+    if [ -f "${outputRedirect}" ]; then
+        cat "${outputRedirect}"
+    fi
+
+    removeOutputRedirectFile
+    echo -e "\e[41m Error while running phpstan. \e[0m"
+}
+
+function removeOutputRedirectFile() {
+    if [ -f "${outputRedirect}" ]; then
+        rm "${outputRedirect}"
+    fi
+}
+
+trap onError ERR
+
+verbosityLevel=0
+for param in "$@"; do
+    if [ "$param" == "-v" ]; then
+        verbosityLevel=1
+    elif [ "$param" == "-vv" ]; then
+        verbosityLevel=2
+    elif [ "$param" == "-vvv" ]; then
+        verbosityLevel=3
+    fi
+done
+
+if [ ${verbosityLevel} -ge 1 ]; then
+    outputRedirect="/proc/self/fd/0"
 fi
+
+echo -e "phpstan with \e[32mPHP 7.1\e[0m."
+${rootDirectory}/bin/ci/phpstan-php-7-1 > ${outputRedirect} 2>&1
+
+echo -e "phpstan with \e[32mPHP 7.2\e[0m."
+${rootDirectory}/bin/ci/phpstan-php-7-2 > ${outputRedirect} 2>&1
+
+echo -e "phpstan with \e[32mPHP 7.3\e[0m."
+${rootDirectory}/bin/ci/phpstan-php-7-3 > ${outputRedirect} 2>&1
+
+echo -e "phpstan with \e[32mPHP 7.4\e[0m."
+${rootDirectory}/bin/ci/phpstan-php-7-4 > ${outputRedirect} 2>&1

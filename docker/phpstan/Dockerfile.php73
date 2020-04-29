@@ -1,7 +1,7 @@
-FROM php:7.2.0-cli-alpine
+FROM php:7.3.0-cli-alpine
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
-COPY docker/phpunit/composer.json /root/.composer/composer.json
+COPY docker/phpstan/composer.json /root/.composer/composer.json
 
 RUN \
     # zip is for Composer, git to clone repository and for CircleCI and openssh for CircleCI
@@ -9,9 +9,7 @@ RUN \
     && composer global update \
     && rm /usr/local/bin/composer
 
-COPY docker/phpunit/phpunit.xml /phpunit/phpunit.xml
+COPY docker/phpstan/phpstan.neon /phpstan/phpstan.neon
 
-COPY docker/phpunit/docker-entrypoint /usr/local/bin/docker-entrypoint
-ENV PHPUNIT_PARAMETERS=""
+COPY docker/phpstan/docker-entrypoint /usr/local/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
-

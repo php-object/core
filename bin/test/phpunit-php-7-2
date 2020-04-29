@@ -11,9 +11,9 @@ if [ $(which docker || false) ]; then
         -it \
         --rm \
         -v ${rootDirectory}:/app:ro \
-        --entrypoint /app/bin/test/phpunit71 \
+        --entrypoint /app/bin/test/phpunit-php-7-2 \
         --env PHPUNIT_PARAMETERS="${phpunitParameters}" \
-        phpobject/core:phpunit-php71
+        phpobject/core:phpunit-php-7-2
 else
-    phpunit ${PHPUNIT_PARAMETERS}
+    docker-entrypoint
 fi

@@ -3,7 +3,7 @@
 set -eu
 
 if [ $(which docker || false) ]; then
-    readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+    readonly rootDirectory="$(realpath $(dirname $(realpath $0))/../..)"
     readonly phpunitParameters="$@"
 
     docker \
@@ -11,9 +11,9 @@ if [ $(which docker || false) ]; then
         -it \
         --rm \
         -v ${rootDirectory}:/app:ro \
-        --entrypoint /app/bin/test/phpunit74 \
+        --entrypoint /app/bin/test/phpunit-php-7-3 \
         --env PHPUNIT_PARAMETERS="${phpunitParameters}" \
-        phpobject/core:phpunit-php74
+        phpobject/core:phpunit-php-7-3
 else
-    phpunit ${PHPUNIT_PARAMETERS}
+    docker-entrypoint
 fi

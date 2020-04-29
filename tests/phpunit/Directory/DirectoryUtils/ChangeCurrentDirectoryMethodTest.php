@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpunit\Directory\DirectoryUtils;
+namespace PhpObject\Tests\PhpUnit\Directory\DirectoryUtils;
 
 use PhpObject\{
     Directory\DirectoryUtils,
