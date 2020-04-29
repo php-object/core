@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+set -eu
+
+/root/.composer/vendor/bin/phpunit /app/tests/phpunit --configuration=/phpunit/phpunit.xml ${PHPUNIT_PARAMETERS}

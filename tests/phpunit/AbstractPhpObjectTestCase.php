@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractPhpObjectTestCase extends TestCase
 {
+    /** @param array<int|string|null> $lastError */
     public static function assertLastPhpError(
         array $lastError,
         int $number,
@@ -25,6 +26,7 @@ abstract class AbstractPhpObjectTestCase extends TestCase
         static::assertEquals($line, $lastError['line'] ?? null);
     }
 
+    /** @param array<int|string|null> $lastError */
     public static function assertNoPhpError(array $lastError): void
     {
         static::assertCount(
@@ -34,7 +36,7 @@ abstract class AbstractPhpObjectTestCase extends TestCase
         );
     }
 
-    /** @var array */
+    /** @var array<int|string|null> */
     protected $lastError = [];
 
     public function setLastPhpError(int $number, string $error, string $file = null, int $line = null): self
@@ -49,6 +51,7 @@ abstract class AbstractPhpObjectTestCase extends TestCase
         return $this;
     }
 
+    /** @return array<int|string|null> */
     protected function getLastPhpError(): array
     {
         return $this->lastError;

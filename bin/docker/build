@@ -3,10 +3,17 @@
 set -eu
 
 readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
-readonly dockerImagePhpUnitPhp71="phpobject/core:phpunit-php71"
-readonly dockerImagePhpUnitPhp72="phpobject/core:phpunit-php72"
-readonly dockerImagePhpUnitPhp73="phpobject/core:phpunit-php73"
-readonly dockerImagePhpUnitPhp74="phpobject/core:phpunit-php74"
+
+readonly dockerImagePhpstanPhp71="phpobject/core:phpstan-php-7-1"
+readonly dockerImagePhpstanPhp72="phpobject/core:phpstan-php-7-2"
+readonly dockerImagePhpstanPhp73="phpobject/core:phpstan-php-7-3"
+readonly dockerImagePhpstanPhp74="phpobject/core:phpstan-php-7-4"
+
+readonly dockerImagePhpUnitPhp71="phpobject/core:phpunit-php-7-1"
+readonly dockerImagePhpUnitPhp72="phpobject/core:phpunit-php-7-2"
+readonly dockerImagePhpUnitPhp73="phpobject/core:phpunit-php-7-3"
+readonly dockerImagePhpUnitPhp74="phpobject/core:phpunit-php-7-4"
+
 outputRedirect="/tmp/php-object.docker.build.log"
 
 function onError() {
@@ -27,10 +34,10 @@ function removeOutputRedirectFile() {
 
 trap onError ERR
 
-function buildPhpUnitImage() {
+function buildImage() {
     trap onError ERR
 
-    local phpVersion="${1}"
+    local type="${1}"
     local dockerFileExtension="${2}"
     local dockerImageTag="${3}"
 
@@ -39,11 +46,20 @@ function buildPhpUnitImage() {
         build \
         --force-rm \
         --tag ${dockerImageTag} \
-        --file ${rootDirectory}/docker/phpunit/Dockerfile.${dockerFileExtension} \
+        --file ${rootDirectory}/docker/${type}/Dockerfile.${dockerFileExtension} \
         ${dockerQuietParam} \
         ${dockerNoCacheParam} \
         . \
         > ${outputRedirect} 2>&1
+}
+
+function pushDockerImage() {
+    trap onError ERR
+
+    local tag=${1}
+
+    echo -e "Push Docker image \e[32m${tag}\e[0m to \e[32mdockerhub\e[0m."
+    docker push "${tag}" > ${outputRedirect} 2>&1
 }
 
 removeOutputRedirectFile
@@ -73,27 +89,30 @@ else
     dockerQuietParam="--quiet"
 fi
 
-buildPhpUnitImage "7.1" "php71" "${dockerImagePhpUnitPhp71}"
-buildPhpUnitImage "7.2" "php72" "${dockerImagePhpUnitPhp72}"
-buildPhpUnitImage "7.3" "php73" "${dockerImagePhpUnitPhp73}"
-buildPhpUnitImage "7.4" "php74" "${dockerImagePhpUnitPhp74}"
+buildImage "phpstan" "php71" "${dockerImagePhpstanPhp71}"
+buildImage "phpstan" "php72" "${dockerImagePhpstanPhp72}"
+buildImage "phpstan" "php73" "${dockerImagePhpstanPhp73}"
+buildImage "phpstan" "php74" "${dockerImagePhpstanPhp74}"
+
+buildImage "phpunit" "php71" "${dockerImagePhpUnitPhp71}"
+buildImage "phpunit" "php72" "${dockerImagePhpUnitPhp72}"
+buildImage "phpunit" "php73" "${dockerImagePhpUnitPhp73}"
+buildImage "phpunit" "php74" "${dockerImagePhpUnitPhp74}"
 
 if [ ${pushDockerImages} == true ]; then
     echo -e "Login to \e[32mdockerhub\e[0m."
     docker logout > ${outputRedirect} 2>&1
     docker login --username=phpobject
 
-    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp71}\e[0m to \e[32mdockerhub\e[0m."
-    docker push "${dockerImagePhpUnitPhp71}" > ${outputRedirect} 2>&1
+    pushDockerImage ${dockerImagePhpstanPhp71}
+    pushDockerImage ${dockerImagePhpstanPhp72}
+    pushDockerImage ${dockerImagePhpstanPhp73}
+    pushDockerImage ${dockerImagePhpstanPhp74}
 
-    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp72}\e[0m to \e[32mdockerhub\e[0m."
-    docker push "${dockerImagePhpUnitPhp72}" > ${outputRedirect} 2>&1
-
-    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp73}\e[0m to \e[32mdockerhub\e[0m."
-    docker push "${dockerImagePhpUnitPhp73}" > ${outputRedirect} 2>&1
-
-    echo -e "Push Docker image \e[32m${dockerImagePhpUnitPhp74}\e[0m to \e[32mdockerhub\e[0m."
-    docker push "${dockerImagePhpUnitPhp74}" > ${outputRedirect} 2>&1
+    pushDockerImage ${dockerImagePhpUnitPhp71}
+    pushDockerImage ${dockerImagePhpUnitPhp72}
+    pushDockerImage ${dockerImagePhpUnitPhp73}
+    pushDockerImage ${dockerImagePhpUnitPhp74}
 fi
 
 removeOutputRedirectFile
