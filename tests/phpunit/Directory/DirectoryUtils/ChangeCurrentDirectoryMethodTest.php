@@ -6,6 +6,7 @@ namespace phpunit\Directory\DirectoryUtils;
 
 use PhpObject\{
     Directory\DirectoryUtils,
+    ErrorHandler\PhpObjectErrorHandlerUtils,
     Exception\Directory\DirectoryNotFoundException,
     Tests\PhpUnit\AbstractPhpObjectTestCase
 };
@@ -14,33 +15,44 @@ final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
 {
     public function testExistingDirectory(): void
     {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
+        $this->enableTestErrorHandler();
+
         DirectoryUtils::changeCurrentDirectory(sys_get_temp_dir());
-        $this->addToAssertionCount(1);
+        static::assertNoPhpError($this->getLastPhpError());
         DirectoryUtils::changeCurrentDirectory(__DIR__ . '/../../..');
     }
 
     public function testDirectoryNotFound(): void
     {
-        $directory = sys_get_temp_dir() . '/foo';
-
-        static::expectException(DirectoryNotFoundException::class);
-        static::expectExceptionMessage("Directory \"$directory\" not found.");
-        static::expectExceptionCode(0);
-
-        DirectoryUtils::changeCurrentDirectory($directory);
-    }
-
-    public function testPhpError(): void
-    {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(true);
         $this->enableTestErrorHandler();
 
+        $directory = sys_get_temp_dir() . '/foo';
+
         try {
-            DirectoryUtils::changeCurrentDirectory('/fifou');
+            DirectoryUtils::changeCurrentDirectory($directory);
         } catch (DirectoryNotFoundException $exception) {
-            // Nothing to do there
+            static::assertEquals("Directory \"$directory\" not found.", $exception->getMessage());
+            static::assertEquals(0, $exception->getCode());
         }
 
-        $this->disableTestErrorHandler();
+        static::assertNoPhpError($this->getLastPhpError());
+    }
+
+    public function testDirectoryNotFoundPhpError(): void
+    {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
+        $this->enableTestErrorHandler();
+
+        $directory = sys_get_temp_dir() . '/foo';
+
+        try {
+            DirectoryUtils::changeCurrentDirectory($directory);
+        } catch (DirectoryNotFoundException $exception) {
+            static::assertEquals("Directory \"$directory\" not found.", $exception->getMessage());
+            static::assertEquals(0, $exception->getCode());
+        }
 
         static::assertLastPhpError(
             $this->lastError,
@@ -49,7 +61,5 @@ final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
             '/app/src/Directory/DirectoryUtils.php',
             19
         );
-
-        $this->resetLastError();
     }
 }

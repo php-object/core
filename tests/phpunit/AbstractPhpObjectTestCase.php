@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace PhpObject\Tests\PhpUnit;
 
-use PhpObject\ErrorHandler\PhpObjectErrorHandlerUtils;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractPhpObjectTestCase extends TestCase
@@ -57,9 +56,8 @@ abstract class AbstractPhpObjectTestCase extends TestCase
 
     protected function enableTestErrorHandler(): self
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
         TestErrorHandler::enable($this);
-        $this->lastError = [];
+        $this->resetLastError();
 
         return $this;
     }
@@ -67,7 +65,6 @@ abstract class AbstractPhpObjectTestCase extends TestCase
     protected function disableTestErrorHandler(): self
     {
         TestErrorHandler::disable();
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(true);
 
         return $this;
     }

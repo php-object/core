@@ -18,7 +18,7 @@ jobs:
                 paths:
                     - vendor
 
-    composerRequireChecker:
+    composer-require-checker:
         docker:
             - image: steevanb/composer-require-checker:2.1.0
         working_directory: /app
@@ -52,7 +52,7 @@ jobs:
                 name: phpstan
                 command: bin/ci/phpstan
 
-    phpunit_php71:
+    phpunit-php-7-1:
         docker:
             - image: phpobject/core:phpunit-php71
         working_directory: /app
@@ -64,7 +64,7 @@ jobs:
                 name: PHPUnit with PHP 7.1.0
                 command: bin/test/phpunit71
 
-    phpunit_php72:
+    phpunit-php-7-2:
         docker:
             - image: phpobject/core:phpunit-php72
         working_directory: /app
@@ -76,7 +76,7 @@ jobs:
                   name: PHPUnit with PHP 7.2.0
                   command: bin/test/phpunit72
 
-    phpunit_php73:
+    phpunit-php-7-3:
         docker:
             - image: phpobject/core:phpunit-php73
         working_directory: /app
@@ -88,7 +88,7 @@ jobs:
                   name: PHPUnit with PHP 7.3.0
                   command: bin/test/phpunit73
 
-    phpunit_php74:
+    phpunit-php-7-4:
         docker:
             - image: phpobject/core:phpunit-php74
         working_directory: /app
@@ -106,21 +106,21 @@ workflows:
         jobs:
             - phpcs
             - composer
-            - composerRequireChecker:
+            - composer-require-checker:
                 requires:
                     - composer
             - phpstan:
                 requires:
                     - composer
-            - phpunit_php71:
+            - phpunit-php-7-1:
                 requires:
                     - composer
-            - phpunit_php72:
+            - phpunit-php-7-2:
                 requires:
                     - composer
-            - phpunit_php73:
+            - phpunit-php-7-3:
                 requires:
                     - composer
-            - phpunit_php74:
+            - phpunit-php-7-4:
                 requires:
                     - composer

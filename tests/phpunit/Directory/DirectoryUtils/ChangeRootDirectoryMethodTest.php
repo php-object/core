@@ -6,6 +6,7 @@ namespace phpunit\Directory\DirectoryUtils;
 
 use PhpObject\{
     Directory\DirectoryUtils,
+    ErrorHandler\PhpObjectErrorHandlerUtils,
     Exception\Directory\DirectoryNotFoundException,
     Tests\PhpUnit\AbstractPhpObjectTestCase
 };
@@ -14,6 +15,8 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
 {
     public function testChrootNotFound(): void
     {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
+
         // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
         if ($this->isPhp71() === true || $this->isPhp72() === true) {
             $this->enableTestErrorHandler();
@@ -38,6 +41,8 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
 
     public function testExistingDirectory(): void
     {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
+
         // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
         if ($this->isPhp71() === true || $this->isPhp72() === true) {
             $this->addToAssertionCount(1);
@@ -54,6 +59,31 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
 
     public function testDirectoryNotFound(): void
     {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(true);
+
+        // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
+        if ($this->isPhp71() === true || $this->isPhp72() === true) {
+            $this->addToAssertionCount(1);
+
+        } elseif ($this->isPhp73() === true || $this->isPhp74() === true) {
+            $this->enableTestErrorHandler();
+            try {
+                DirectoryUtils::changeRootDirectory('/foo');
+            } catch (DirectoryNotFoundException $excetion) {
+                static::assertEquals('Directory "/foo" not found.', $excetion->getMessage());
+                static::assertEquals(0, $excetion->getCode());
+            }
+            static::assertNoPhpError($this->getLastPhpError());
+
+        } else {
+            static::fail('Unknown PHP version.');
+        }
+    }
+
+    public function testDirectoryNotFoundPhpError(): void
+    {
+        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
+
         // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
         if ($this->isPhp71() === true || $this->isPhp72() === true) {
             $this->addToAssertionCount(1);
