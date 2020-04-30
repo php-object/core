@@ -101,7 +101,7 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
                 E_WARNING,
                 'chroot(): No such file or directory (errno 2)',
                 '/app/src/Directory/DirectoryUtils.php',
-                36
+                63
             );
 
         } else {

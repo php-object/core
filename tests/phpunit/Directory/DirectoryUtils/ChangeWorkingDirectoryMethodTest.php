@@ -11,16 +11,24 @@ use PhpObject\{
     Tests\PhpUnit\AbstractPhpObjectTestCase
 };
 
-final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
+final class ChangeWorkingDirectoryMethodTest extends AbstractPhpObjectTestCase
 {
     public function testExistingDirectory(): void
     {
         PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
         $this->enableTestErrorHandler();
 
-        DirectoryUtils::changeCurrentDirectory(sys_get_temp_dir());
+        $workingDirectory = getcwd();
+        if (is_string($workingDirectory) === false) {
+            static::fail('Could not get working directory.');
+        }
+
+        $directory = sys_get_temp_dir();
+        DirectoryUtils::changeWorkingDirectory($directory);
+        static::assertEquals($directory, getcwd());
         static::assertNoPhpError($this->getLastPhpError());
-        DirectoryUtils::changeCurrentDirectory(__DIR__ . '/../../..');
+
+        DirectoryUtils::changeWorkingDirectory($workingDirectory);
     }
 
     public function testDirectoryNotFound(): void
@@ -31,7 +39,7 @@ final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
         $directory = sys_get_temp_dir() . '/foo';
 
         try {
-            DirectoryUtils::changeCurrentDirectory($directory);
+            DirectoryUtils::changeWorkingDirectory($directory);
         } catch (DirectoryNotFoundException $exception) {
             static::assertEquals("Directory \"$directory\" not found.", $exception->getMessage());
             static::assertEquals(0, $exception->getCode());
@@ -48,7 +56,7 @@ final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
         $directory = sys_get_temp_dir() . '/foo';
 
         try {
-            DirectoryUtils::changeCurrentDirectory($directory);
+            DirectoryUtils::changeWorkingDirectory($directory);
         } catch (DirectoryNotFoundException $exception) {
             static::assertEquals("Directory \"$directory\" not found.", $exception->getMessage());
             static::assertEquals(0, $exception->getCode());
@@ -59,7 +67,7 @@ final class ChangeCurrentDirectoryMethodTest extends AbstractPhpObjectTestCase
             E_WARNING,
             'chdir(): No such file or directory (errno 2)',
             '/app/src/Directory/DirectoryUtils.php',
-            19
+            20
         );
     }
 }
