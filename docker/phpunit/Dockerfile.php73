@@ -13,4 +13,5 @@ COPY docker/phpunit/phpunit.xml /phpunit/phpunit.xml
 
 COPY docker/phpunit/docker-entrypoint /usr/local/bin/docker-entrypoint
 ENV PHPUNIT_PARAMETERS=""
+WORKDIR /app
 ENTRYPOINT ["docker-entrypoint"]

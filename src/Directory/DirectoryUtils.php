@@ -6,13 +6,14 @@ namespace PhpObject\Directory;
 
 use PhpObject\{
     ErrorHandler\PhpObjectErrorHandlerUtils,
-    Exception\Directory\DirectoryNotFoundException
+    Exception\Directory\DirectoryNotFoundException,
+    Exception\PhpObjectException
 };
 
 class DirectoryUtils
 {
     /** @link https://www.php.net/manual/en/function.chdir.php */
-    public static function changeCurrentDirectory(string $directory): void
+    public static function changeWorkingDirectory(string $directory): void
     {
         PhpObjectErrorHandlerUtils::disableCustomErrorHandler();
         try {
@@ -26,6 +27,32 @@ class DirectoryUtils
         if ($executed === false) {
             throw new DirectoryNotFoundException($directory);
         }
+    }
+
+    /** @link https://www.php.net/manual/en/function.getcwd.php */
+    public static function getWorkingDirectory(): string
+    {
+        PhpObjectErrorHandlerUtils::disableCustomErrorHandler();
+        try {
+            $return = getcwd();
+        } catch (\Throwable $exception) {
+            PhpObjectErrorHandlerUtils::restorePreviousErrorHandler();
+            throw new PhpObjectException(
+                'getcwd() failed, maybe one of the parent directories does not have the readable or search mode set?',
+                0,
+                $exception
+            );
+        }
+        PhpObjectErrorHandlerUtils::restorePreviousErrorHandler();
+
+        if (is_string($return) === false) {
+            throw new PhpObjectException(
+                'getcwd() failed, maybe one of the parent directories does not have the readable or search mode set?',
+                0
+            );
+        }
+
+        return $return;
     }
 
     /** @link https://www.php.net/manual/en/function.chroot.php */
