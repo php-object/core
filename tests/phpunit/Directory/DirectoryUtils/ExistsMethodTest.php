@@ -2,46 +2,43 @@
 
 declare(strict_types=1);
 
-namespace PhpObject\Tests\PhpUnit\Directory\DirectoryUtils;
+namespace PhpObject\Core\Tests\PhpUnit\Directory\DirectoryUtils;
 
-use PhpObject\{
+use PhpObject\Core\{
     Directory\DirectoryUtils,
-    ErrorHandler\PhpObjectErrorHandlerUtils,
-    Tests\PhpUnit\AbstractPhpObjectTestCase
+    Tests\PhpUnit\AbstractTestCase
 };
 
-final class ExistsMethodTest extends AbstractPhpObjectTestCase
+final class ExistsMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
+        $directory = __DIR__;
         $this->enableTestErrorHandler();
-
-        static::assertTrue(DirectoryUtils::exists(__DIR__));
-        static::assertNoPhpError($this->getLastPhpError());
-
+        $result = DirectoryUtils::exists($directory);
         $this->disableTestErrorHandler();
+
+        static::assertTrue($result, "Directory \"$directory\" does not exists but should exists.");
+        static::assertNoPhpError($this->getLastPhpError());
     }
 
-    public function testNotFoundDirectory(): void
+    public function testDirectoryNotFound(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
         $this->enableTestErrorHandler();
-
-        static::assertFalse(DirectoryUtils::exists(__DIR__ . '/foo'));
-        static::assertNoPhpError($this->getLastPhpError());
-
+        $result = DirectoryUtils::exists(__DIR__ . '/foo');
         $this->disableTestErrorHandler();
+
+        static::assertFalse($result);
+        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testFile(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
         $this->enableTestErrorHandler();
-
-        static::assertFalse(DirectoryUtils::exists(__FILE__));
-        static::assertNoPhpError($this->getLastPhpError());
-
+        $result = DirectoryUtils::exists(__FILE__);
         $this->disableTestErrorHandler();
+
+        static::assertFalse($result);
+        static::assertNoPhpError($this->getLastPhpError());
     }
 }
