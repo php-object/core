@@ -77,4 +77,13 @@ class DirectoryUtils
             throw new DirectoryNotFoundException($directory);
         }
     }
+
+    public static function getParentDirectory(string $path, int $levels = 1): string
+    {
+        PhpObjectErrorHandlerUtils::disableCustomErrorHandler();
+        $return = dirname($path, $levels);
+        PhpObjectErrorHandlerUtils::restorePreviousErrorHandler();
+
+        return $return;
+    }
 }
