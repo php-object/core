@@ -14,7 +14,6 @@ if [ $(which docker || false) ]; then
         steevanb/php-code-sniffs:4.0.2
 else
     PHPCS_PARAMETERS="-p --warning-severity=0 --ignore=/app/vendor/"
-    PHPCS_BOOTSTRAP="/app/phpcs.bootstrap.php"
 
     /var/php-code-sniffs/docker/entrypoint.sh
 fi

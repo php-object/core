@@ -2,34 +2,39 @@
 
 declare(strict_types=1);
 
-namespace PhpObject\Tests\PhpUnit\Directory\DirectoryUtils;
+namespace PhpObject\Core\Tests\PhpUnit\Directory\DirectoryUtils;
 
-use PhpObject\{
+use PhpObject\Core\{
     Directory\DirectoryUtils,
-    ErrorHandler\PhpObjectErrorHandlerUtils,
     Exception\Directory\DirectoryNotFoundException,
-    Tests\PhpUnit\AbstractPhpObjectTestCase
+    Tests\PhpUnit\AbstractTestCase
 };
 
-final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
+final class ChangeRootDirectoryMethodTest extends AbstractTestCase
 {
     public function testChrootNotFound(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
-
         // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
         if ($this->isPhp71() === true || $this->isPhp72() === true) {
+            $exceptionThrowned = false;
             $this->enableTestErrorHandler();
             try {
                 DirectoryUtils::changeRootDirectory('/');
             } catch (\Error $exception) {
+                $this->disableTestErrorHandler();
+
+                static::assertEquals(\Error::class, get_class($exception));
                 static::assertEquals(
-                    'Call to undefined function PhpObject\Directory\chroot()',
+                    'Call to undefined function PhpObject\Core\Directory\chroot()',
                     $exception->getMessage()
                 );
                 static::assertEquals(0, $exception->getCode());
+                static::assertNoPhpError($this->getLastPhpError());
+
+                $exceptionThrowned = true;
             }
-            static::assertNoPhpError($this->getLastPhpError());
+
+            $this->assertExceptionThrowned($exceptionThrowned, \Error::class);
 
         } elseif ($this->isPhp73() === true || $this->isPhp74() === true) {
             $this->addToAssertionCount(1);
@@ -41,8 +46,6 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
 
     public function testExistingDirectory(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
-
         // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
         if ($this->isPhp71() === true || $this->isPhp72() === true) {
             $this->addToAssertionCount(1);
@@ -50,6 +53,9 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
         } elseif ($this->isPhp73() === true || $this->isPhp74() === true) {
             $this->enableTestErrorHandler();
             DirectoryUtils::changeRootDirectory('/');
+            $this->disableTestErrorHandler();
+
+            static::assertSame('/', getcwd());
             static::assertNoPhpError($this->getLastPhpError());
 
         } else {
@@ -59,73 +65,37 @@ final class ChangeRootDirectoryMethodTest extends AbstractPhpObjectTestCase
 
     public function testDirectoryNotFound(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(true);
-
         // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
         if ($this->isPhp71() === true || $this->isPhp72() === true) {
             $this->addToAssertionCount(1);
 
         } elseif ($this->isPhp73() === true || $this->isPhp74() === true) {
+            $exceptionThrowned = true;
             $this->enableTestErrorHandler();
+
             try {
                 DirectoryUtils::changeRootDirectory('/foo');
-            } catch (DirectoryNotFoundException $excetion) {
-                static::assertEquals('Directory "/foo" not found.', $excetion->getMessage());
-                static::assertEquals(0, $excetion->getCode());
+            } catch (DirectoryNotFoundException $exception) {
+                $this->disableTestErrorHandler();
+
+                static::assertPhpErrorException(
+                    $exception,
+                    'Directory "/foo" not found.',
+                    0,
+                    E_WARNING,
+                    'chroot(): No such file or directory (errno 2)',
+                    DirectoryUtils::class,
+                    52
+                );
+                static::assertNoPhpError($this->getLastPhpError());
+
+                $exceptionThrowned = true;
             }
-            static::assertNoPhpError($this->getLastPhpError());
+
+            $this->assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
 
         } else {
             static::fail('Unknown PHP version.');
         }
-    }
-
-    public function testDirectoryNotFoundPhpError(): void
-    {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
-
-        // chroot() is not available in PHPUnit context for PHP 7.1 and 7.2
-        if ($this->isPhp71() === true || $this->isPhp72() === true) {
-            $this->addToAssertionCount(1);
-
-        } elseif ($this->isPhp73() === true || $this->isPhp74() === true) {
-            $this->enableTestErrorHandler();
-            try {
-                DirectoryUtils::changeRootDirectory('/foo');
-            } catch (DirectoryNotFoundException $excetion) {
-                static::assertEquals('Directory "/foo" not found.', $excetion->getMessage());
-                static::assertEquals(0, $excetion->getCode());
-            }
-            static::assertLastPhpError(
-                $this->getLastPhpError(),
-                E_WARNING,
-                'chroot(): No such file or directory (errno 2)',
-                '/app/src/Directory/DirectoryUtils.php',
-                63
-            );
-
-        } else {
-            static::fail('Unknown PHP version.');
-        }
-    }
-
-    private function isPhp71(): bool
-    {
-        return version_compare(PHP_VERSION, '7.1.0') === 0;
-    }
-
-    private function isPhp72(): bool
-    {
-        return version_compare(PHP_VERSION, '7.2.0') === 0;
-    }
-
-    private function isPhp73(): bool
-    {
-        return version_compare(PHP_VERSION, '7.3.0') === 0;
-    }
-
-    private function isPhp74(): bool
-    {
-        return version_compare(PHP_VERSION, '7.4.0') === 0;
     }
 }

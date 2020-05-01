@@ -4,7 +4,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PhpObject\\Tests\\PhpUnit\\": "/app/tests/phpunit"
+            "PhpObject\\Core\\Tests\\PhpUnit\\": "/app/tests/phpunit"
         }
     }
 }

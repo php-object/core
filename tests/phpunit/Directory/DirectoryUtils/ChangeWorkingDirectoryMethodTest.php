@@ -2,72 +2,60 @@
 
 declare(strict_types=1);
 
-namespace PhpObject\Tests\PhpUnit\Directory\DirectoryUtils;
+namespace PhpObject\Core\Tests\PhpUnit\Directory\DirectoryUtils;
 
-use PhpObject\{
+use PhpObject\Core\{
     Directory\DirectoryUtils,
-    ErrorHandler\PhpObjectErrorHandlerUtils,
     Exception\Directory\DirectoryNotFoundException,
-    Tests\PhpUnit\AbstractPhpObjectTestCase
+    Tests\PhpUnit\AbstractTestCase
 };
 
-final class ChangeWorkingDirectoryMethodTest extends AbstractPhpObjectTestCase
+final class ChangeWorkingDirectoryMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
-        $this->enableTestErrorHandler();
-
         $workingDirectory = getcwd();
         if (is_string($workingDirectory) === false) {
             static::fail('Could not get working directory.');
         }
 
         $directory = sys_get_temp_dir();
+
+        $this->enableTestErrorHandler();
         DirectoryUtils::changeWorkingDirectory($directory);
+        $this->disableTestErrorHandler();
+
         static::assertEquals($directory, getcwd());
         static::assertNoPhpError($this->getLastPhpError());
 
-        DirectoryUtils::changeWorkingDirectory($workingDirectory);
+        static::assertTrue(chdir($workingDirectory));
     }
 
     public function testDirectoryNotFound(): void
     {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(true);
-        $this->enableTestErrorHandler();
-
         $directory = sys_get_temp_dir() . '/foo';
 
+        $exceptionThrowned = false;
+        $this->enableTestErrorHandler();
         try {
             DirectoryUtils::changeWorkingDirectory($directory);
         } catch (DirectoryNotFoundException $exception) {
-            static::assertEquals("Directory \"$directory\" not found.", $exception->getMessage());
-            static::assertEquals(0, $exception->getCode());
+            $this->disableTestErrorHandler();
+
+            static::assertPhpErrorException(
+                $exception,
+                "Directory \"$directory\" not found.",
+                0,
+                E_WARNING,
+                'chdir(): No such file or directory (errno 2)',
+                DirectoryUtils::class,
+                19
+            );
+            static::assertNoPhpError($this->getLastPhpError());
+
+            $exceptionThrowned = true;
         }
 
-        static::assertNoPhpError($this->getLastPhpError());
-    }
-
-    public function testDirectoryNotFoundPhpError(): void
-    {
-        PhpObjectErrorHandlerUtils::setDisableCustomErrorHandler(false);
-        $this->enableTestErrorHandler();
-
-        $directory = sys_get_temp_dir() . '/foo';
-
-        try {
-            DirectoryUtils::changeWorkingDirectory($directory);
-        } catch (DirectoryNotFoundException $exception) {
-            static::assertEquals("Directory \"$directory\" not found.", $exception->getMessage());
-            static::assertEquals(0, $exception->getCode());
-        }
-
-        static::assertLastPhpError(
-            $this->lastError,
-            E_WARNING,
-            'chdir(): No such file or directory (errno 2)',
-            '/app/src/Directory/DirectoryUtils.php',
-            20
-        );
+        $this->assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
     }
 }
