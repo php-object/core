@@ -86,4 +86,13 @@ class DirectoryUtils
 
         return $return;
     }
+
+    public static function exists(string $directory): bool
+    {
+        PhpObjectErrorHandlerUtils::disableCustomErrorHandler();
+        $return = file_exists($directory) && is_dir($directory);
+        PhpObjectErrorHandlerUtils::restorePreviousErrorHandler();
+
+        return $return;
+    }
 }
