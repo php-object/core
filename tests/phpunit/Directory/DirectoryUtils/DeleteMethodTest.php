@@ -14,123 +14,75 @@ final class DeleteMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
         mkdir($directory);
 
-        $this->enableTestErrorHandler();
-        DirectoryUtils::delete($directory);
-        $this->disableTestErrorHandler();
-
+        $this->callPhpObjectMethod(
+            function () use ($directory): void {
+                DirectoryUtils::delete($directory);
+            }
+        );
         static::assertFalse(is_dir($directory));
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testDirectoryNotFound(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
 
-        $exceptionThrowned = false;
-        $this->enableTestErrorHandler();
-        try {
-            DirectoryUtils::delete($directory);
-        } catch (DirectoryNotFoundException $exception) {
-            $this->disableTestErrorHandler();
-
-            static::assertException(
-                $exception,
-                DirectoryNotFoundException::class,
-                "Directory \"$directory\" not found."
-            );
-            static::assertExceptionWithoutPhpError($exception);
-
-            $exceptionThrowned = true;
-        }
-
-        $this->assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
-        static::assertNoPhpError($this->getLastPhpError());
+        $this->assertExceptionIsThrowned(
+            function () use ($directory): void {
+                DirectoryUtils::delete($directory);
+            },
+            DirectoryNotFoundException::class,
+            "Directory \"$directory\" not found."
+        );
     }
 
     public function testFile(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
         mkdir($directory);
         $file = "$directory/foo";
         touch($file);
 
-        $exceptionThrowned = false;
-        $this->enableTestErrorHandler();
-        try {
-            DirectoryUtils::delete($file);
-        } catch (DirectoryNotFoundException $exception) {
-            $this->disableTestErrorHandler();
-
-            static::assertException(
-                $exception,
-                DirectoryNotFoundException::class,
-                "Directory \"$file\" not found."
-            );
-            static::assertExceptionWithoutPhpError($exception);
-
-            $exceptionThrowned = true;
-        }
-
-        static::assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
-        static::assertNoPhpError($this->getLastPhpError());
+        $this->assertExceptionIsThrowned(
+            function () use ($file): void {
+                DirectoryUtils::delete($file);
+            },
+            DirectoryNotFoundException::class,
+            "Directory \"$file\" not found."
+        );
     }
 
     public function testSymbolicLink(): void
     {
-        $sourceDirectory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $sourceDirectory = $this->getTemporaryDirectory();
         mkdir($sourceDirectory);
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
         symlink($sourceDirectory, $directory);
 
-        $exceptionThrowned = false;
-        $this->enableTestErrorHandler();
-        try {
-            DirectoryUtils::delete($directory);
-        } catch (DirectoryNotFoundException $exception) {
-            $this->disableTestErrorHandler();
-
-            static::assertException(
-                $exception,
-                DirectoryNotFoundException::class,
-                "Directory \"$directory\" is a symbolic link, "
-                    . 'use PhpObject\Core\Link\SymbolicLinkUtils::delete() to delete it.'
-            );
-            static::assertExceptionWithoutPhpError($exception);
-
-            $exceptionThrowned = true;
-        }
-
-        static::assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
-        static::assertNoPhpError($this->getLastPhpError());
+        $this->assertExceptionIsThrowned(
+            function () use ($directory): void {
+                DirectoryUtils::delete($directory);
+            },
+            DirectoryNotFoundException::class,
+            "Directory \"$directory\" is a symbolic link, "
+                . 'use PhpObject\Core\Link\SymbolicLinkUtils::delete() to delete it.'
+        );
     }
 
     public function testSymbolicLinkNotFound(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
+        $destination = $this->getTemporaryDirectory();
         symlink($directory, $destination);
 
-        $exceptionThrowned = false;
-        $this->enableTestErrorHandler();
-        try {
-            DirectoryUtils::delete($directory);
-        } catch (DirectoryNotFoundException $exception) {
-            $this->disableTestErrorHandler();
-
-            static::assertException(
-                $exception,
-                DirectoryNotFoundException::class,
-                "Directory \"$directory\" not found."
-            );
-            static::assertExceptionWithoutPhpError($exception);
-
-            $exceptionThrowned = true;
-        }
-
-        static::assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
-        static::assertNoPhpError($this->getLastPhpError());
+        $this->assertExceptionIsThrowned(
+            function () use ($directory): void {
+                DirectoryUtils::delete($directory);
+            },
+            DirectoryNotFoundException::class,
+            "Directory \"$directory\" not found."
+        );
     }
 }

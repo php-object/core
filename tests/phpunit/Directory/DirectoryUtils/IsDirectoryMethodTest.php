@@ -14,63 +14,68 @@ final class IsDirectoryMethodTest extends AbstractTestCase
     public function testExistingDirectory(): void
     {
         $directory = __DIR__;
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::isDirectory($directory);
-        $this->disableTestErrorHandler();
 
+        $result = $this->callPhpObjectMethod(
+            function () use ($directory): bool {
+                return DirectoryUtils::isDirectory($directory);
+            }
+        );
         static::assertTrue($result, "Directory \"$directory\" does not exists but should exists.");
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testDirectoryNotFound(): void
     {
         $directory = __DIR__;
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::isDirectory($directory . '/foo');
-        $this->disableTestErrorHandler();
 
+        $result = $this->callPhpObjectMethod(
+            function () use ($directory): bool {
+                return DirectoryUtils::isDirectory($directory . '/foo');
+            }
+        );
         static::assertFalse($result, "Directory \"$directory\" exists but should notr exists.");
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testFile(): void
     {
         $file = __FILE__;
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::isDirectory($file);
-        $this->disableTestErrorHandler();
 
+        $result = $this->callPhpObjectMethod(
+            function () use ($file): bool {
+                return DirectoryUtils::isDirectory($file);
+            }
+        );
         static::assertFalse($result, "Path \"$file\" should be a file but is considered as directory.");
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testSymbolicLink(): void
     {
-        $symLink = sys_get_temp_dir() . '/' . uniqid();
-        symlink(__DIR__, $symLink);
+        $symbolicLink = sys_get_temp_dir() . '/' . uniqid();
+        symlink(__DIR__, $symbolicLink);
 
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::isDirectory($symLink);
-        $this->disableTestErrorHandler();
+        $result = $this->callPhpObjectMethod(
+            function () use ($symbolicLink): bool {
+                return DirectoryUtils::isDirectory($symbolicLink);
+            }
+        );
 
-        unlink($symLink);
+        unlink($symbolicLink);
 
-        static::assertTrue($result, "Symbolic link \"$symLink\" should be considered as a directory.");
-        static::assertNoPhpError($this->getLastPhpError());
+        static::assertTrue($result, "Symbolic link \"$symbolicLink\" should be considered as a directory.");
     }
 
     public function testSymbolicLinkNotFound(): void
     {
-        $symLink = sys_get_temp_dir() . '/' . uniqid();
-        symlink(__DIR__ . '/foo', $symLink);
+        $symbolicLink = sys_get_temp_dir() . '/' . uniqid();
+        symlink(__DIR__ . '/foo', $symbolicLink);
 
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::isDirectory($symLink);
-        $this->disableTestErrorHandler();
+        $result = $this->callPhpObjectMethod(
+            function () use ($symbolicLink): bool {
+                return DirectoryUtils::isDirectory($symbolicLink);
+            }
+        );
 
-        unlink($symLink);
+        unlink($symbolicLink);
 
-        static::assertFalse($result, "Symbolic link \"$symLink\" should not be considered as a directory.");
-        static::assertNoPhpError($this->getLastPhpError());
+        static::assertFalse($result, "Symbolic link \"$symbolicLink\" should not be considered as a directory.");
     }
 }

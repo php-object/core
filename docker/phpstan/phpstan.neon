@@ -6,6 +6,10 @@ parameters:
         # Parameter #1 $error_handler of function set_error_handler expects (callable(int, string, string, int, array): bool)|null, array(class-string<static(PhpObject\Tests\PhpUnit\TestErrorHandler)>, 'onError') given.
         # Too hard to exclude it with ignoreErrors
         - /app/tests/phpunit/TestErrorHandler.php
+    ignoreErrors:
+        # I think new static() is a good way to instantiate self in static method.
+        # new self() will not take into account child classes.
+        - '#Unsafe usage of new static().#'
 includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
     - /root/.composer/vendor/phpstan/phpstan-strict-rules/rules.neon
