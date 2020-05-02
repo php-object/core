@@ -42,10 +42,14 @@ final class ChangeWorkingDirectoryMethodTest extends AbstractTestCase
         } catch (DirectoryNotFoundException $exception) {
             $this->disableTestErrorHandler();
 
-            static::assertPhpErrorException(
+            static::assertException(
                 $exception,
+                DirectoryNotFoundException::class,
                 "Directory \"$directory\" not found.",
-                0,
+                0
+            );
+            static::assertExceptionWithPhpError(
+                $exception,
                 E_WARNING,
                 'chdir(): No such file or directory (errno 2)',
                 DirectoryUtils::class,

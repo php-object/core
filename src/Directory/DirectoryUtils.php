@@ -20,7 +20,10 @@ class DirectoryUtils
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
-            throw new DirectoryNotFoundException($directory, $lastError);
+            throw new DirectoryNotFoundException(
+                DirectoryNotFoundException::createDefaultMessage($directory),
+                $lastError
+            );
         }
 
         PhpObjectErrorHandlerManager::assertNoError();
@@ -53,7 +56,10 @@ class DirectoryUtils
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
-            throw new DirectoryNotFoundException($directory, $lastError);
+            throw new DirectoryNotFoundException(
+                DirectoryNotFoundException::createDefaultMessage($directory),
+                $lastError
+            );
         }
 
         PhpObjectErrorHandlerManager::assertNoError();
@@ -79,5 +85,37 @@ class DirectoryUtils
         PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
+    }
+
+    /**
+     * @param resource|null $context
+     * @link https://www.php.net/manual/en/function.rename.php
+     */
+    public static function move(string $source, string $destination, $context = null): void
+    {
+        if (static::isDirectory($source) === false) {
+            throw new DirectoryNotFoundException("Source directory \"$source\" not found.");
+        }
+
+        if (static::isDirectory(static::getParentDirectory($destination)) === false) {
+            throw new DirectoryNotFoundException(
+                'Destination parent directory "' . static::getParentDirectory($destination) . '" not found.'
+            );
+        }
+
+        PhpObjectErrorHandlerManager::enable();
+        // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
+        if ($context === null) {
+            $result = rename($source, $destination);
+        } else {
+            $result = rename($source, $destination, $context);
+        }
+        $lastError = PhpObjectErrorHandlerManager::disable();
+
+        if ($result !== true) {
+            throw new PhpObjectException("Directory \"$source\" cannot be moved to \"$destination\".", $lastError);
+        }
+
+        PhpObjectErrorHandlerManager::assertNoError();
     }
 }

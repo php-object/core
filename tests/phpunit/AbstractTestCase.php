@@ -12,27 +12,34 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractTestCase extends TestCase
 {
-    /** @param class-string $phpErrorClass */
-    public static function assertPhpErrorException(
-        PhpObjectException $exception,
-        string $exceptionError,
-        int $exceptionCode,
-        int $phpErrorNumber,
-        string $phpErrorError,
-        string $phpErrorClass,
-        int $phpErrorLine
-    ): void {
-        static::assertEquals($exceptionError, $exception->getMessage());
-        static::assertEquals($exceptionCode, $exception->getCode());
+    public static function assertException(\Throwable $exception, string $class, string $error, int $code): void
+    {
+        static::assertInstanceOf($class, $exception);
+        static::assertEquals($error, $exception->getMessage());
+        static::assertEquals($code, $exception->getCode());
+    }
 
+    /** @param class-string $class */
+    public static function assertExceptionWithPhpError(
+        PhpObjectException $exception,
+        int $number,
+        string $error,
+        string $class,
+        int $line
+    ): void {
         static::assertInstanceOf(PhpError::class, $exception->getPhpError());
-        static::assertSame($phpErrorNumber, $exception->getPhpError()->getNumber());
-        static::assertSame($phpErrorError, $exception->getPhpError()->getError());
+        static::assertSame($number, $exception->getPhpError()->getNumber());
+        static::assertSame($error, $exception->getPhpError()->getError());
         static::assertSame(
-            (new \ReflectionClass($phpErrorClass))->getFileName(),
+            (new \ReflectionClass($class))->getFileName(),
             $exception->getPhpError()->getFile()
         );
-        static::assertSame($phpErrorLine, $exception->getPhpError()->getLine());
+        static::assertSame($line, $exception->getPhpError()->getLine());
+    }
+
+    public static function assertExceptionWithoutPhpError(PhpObjectException $exception): void
+    {
+        static::assertNull($exception->getPhpError(), 'Exception contains a PHP error but no one was expected.');
     }
 
     public static function assertNoPhpError(?PhpError $phpError): void
