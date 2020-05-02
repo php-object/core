@@ -13,11 +13,11 @@ final class GetWorkingDirectoryMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getWorkingDirectory();
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getWorkingDirectory();
+            }
+        );
         static::assertSame('/app', $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 }

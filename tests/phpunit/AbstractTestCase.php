@@ -66,12 +66,33 @@ abstract class AbstractTestCase extends TestCase
         return false;
     }
 
-    protected function assertExceptionThrowned(bool $throwned, string $class): self
-    {
-        if ($throwned === false) {
+    protected function assertExceptionIsThrowned(
+        callable $callable,
+        string $exceptionClass,
+        string $exceptionError
+    ): self {
+        $exceptionThrowned = false;
+        $this->enableTestErrorHandler();
+
+        try {
+            call_user_func($callable);
+        } catch (\Throwable $exception) {
             $this->disableTestErrorHandler();
-            static::fail("$class exception has not been throwned.");
+
+            static::assertException($exception, $exceptionClass, $exceptionError);
+            if ($exception instanceof PhpObjectException) {
+                static::assertExceptionWithoutPhpError($exception);
+            }
+
+            $exceptionThrowned = true;
         }
+
+        $this->disableTestErrorHandler();
+
+        if ($exceptionThrowned === false) {
+            static::fail("$exceptionClass exception has not been throwned.");
+        }
+        static::assertNoPhpError($this->getLastPhpError());
 
         return $this;
     }
@@ -98,6 +119,23 @@ abstract class AbstractTestCase extends TestCase
         }
 
         return $this;
+    }
+
+    /** @return mixed */
+    protected function callPhpObjectMethod(callable $callable)
+    {
+        $this->enableTestErrorHandler();
+        $return = call_user_func($callable);
+        $this->disableTestErrorHandler();
+
+        static::assertNoPhpError($this->getLastPhpError());
+
+        return $return;
+    }
+
+    protected function getTemporaryDirectory(): string
+    {
+        return sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
     }
 
     protected function isPhp71(): bool

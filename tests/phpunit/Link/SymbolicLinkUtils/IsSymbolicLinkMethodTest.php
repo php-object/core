@@ -13,55 +13,55 @@ final class IsSymbolicLinkMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
         mkdir($directory);
 
-        $this->enableTestErrorHandler();
-        $result = SymbolicLinkUtils::isSymbolicLink($directory);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function () use ($directory): bool {
+                return SymbolicLinkUtils::isSymbolicLink($directory);
+            }
+        );
         static::assertFalse($result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testDirectoryNotFound(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
 
-        $this->enableTestErrorHandler();
-        $result = SymbolicLinkUtils::isSymbolicLink($directory);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function () use ($directory): bool {
+                return SymbolicLinkUtils::isSymbolicLink($directory);
+            }
+        );
         static::assertFalse($result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testExistingSymbolicLink(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
         mkdir($directory);
-        $symbolicLink = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $symbolicLink = $this->getTemporaryDirectory();
         symlink($directory, $symbolicLink);
 
-        $this->enableTestErrorHandler();
-        $result = SymbolicLinkUtils::isSymbolicLink($symbolicLink);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function () use ($symbolicLink): bool {
+                return SymbolicLinkUtils::isSymbolicLink($symbolicLink);
+            }
+        );
         static::assertTrue($result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testSymbolicLinkNotFound(): void
     {
-        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = $this->getTemporaryDirectory();
         mkdir($directory);
-        $symbolicLink = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $symbolicLink = $this->getTemporaryDirectory();
 
-        $this->enableTestErrorHandler();
-        $result = SymbolicLinkUtils::isSymbolicLink($symbolicLink);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function () use ($symbolicLink): bool {
+                return SymbolicLinkUtils::isSymbolicLink($symbolicLink);
+            }
+        );
         static::assertFalse($result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 }

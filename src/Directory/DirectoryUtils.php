@@ -16,13 +16,15 @@ class DirectoryUtils
     /** @link https://www.php.net/manual/en/function.chdir.php */
     public static function changeWorkingDirectory(string $path): void
     {
+        static::assertIsDirectory($path);
+
         PhpObjectErrorHandlerManager::enable();
         $executed = chdir($path);
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
-            throw new DirectoryNotFoundException(
-                DirectoryNotFoundException::createDefaultMessage($path),
+            throw new PhpObjectException(
+                "Error while changing working directory to \"$path\".",
                 $lastError
             );
         }
@@ -52,13 +54,15 @@ class DirectoryUtils
     /** @link https://www.php.net/manual/en/function.chroot.php */
     public static function changeRootDirectory(string $path): void
     {
+        static::assertIsDirectory($path);
+
         PhpObjectErrorHandlerManager::enable();
         $executed = chroot($path);
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
-            throw new DirectoryNotFoundException(
-                DirectoryNotFoundException::createDefaultMessage($path),
+            throw new PhpObjectException(
+                "Error while changing root directory to \"$path\".",
                 $lastError
             );
         }
@@ -88,21 +92,27 @@ class DirectoryUtils
         return $return;
     }
 
+    public static function assertIsDirectory(string $path, string $errorMessage = null): void
+    {
+        if (static::isDirectory($path) === false) {
+            throw new DirectoryNotFoundException(
+                $errorMessage ?? DirectoryNotFoundException::createDefaultMessage($path)
+            );
+        }
+    }
+
     /**
      * @param resource|null $context
      * @link https://www.php.net/manual/en/function.rename.php
      */
     public static function move(string $source, string $destination, $context = null): void
     {
-        if (static::isDirectory($source) === false) {
-            throw new DirectoryNotFoundException("Source directory \"$source\" not found.");
-        }
-
-        if (static::isDirectory(static::getParentDirectory($destination)) === false) {
-            throw new DirectoryNotFoundException(
-                'Destination parent directory "' . static::getParentDirectory($destination) . '" not found.'
-            );
-        }
+        static::assertIsDirectory($source, "Source directory \"$source\" not found.");
+        $destinationParentDirectory = static::getParentDirectory($destination);
+        static::assertIsDirectory(
+            $destinationParentDirectory,
+            "Destination parent directory \"$destinationParentDirectory\" not found."
+        );
 
         // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
         if ($context === null) {
@@ -134,9 +144,7 @@ class DirectoryUtils
             );
         }
 
-        if (static::isDirectory($path) === false) {
-            throw new DirectoryNotFoundException(DirectoryNotFoundException::createDefaultMessage($path));
-        }
+        static::assertIsDirectory($path);
 
         // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
         if ($context === null) {

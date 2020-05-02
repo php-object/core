@@ -13,61 +13,61 @@ final class GetParentDirectoryMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getParentDirectory(__DIR__);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getParentDirectory(__DIR__);
+            }
+        );
         static::assertSame(dirname(__DIR__), $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testUnknownDirectory(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getParentDirectory(__DIR__ . '/foo');
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getParentDirectory(__DIR__ . '/foo');
+            }
+        );
         static::assertSame(__DIR__, $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testLevel3(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getParentDirectory(__DIR__ . '/foo/bar/baz', 3);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getParentDirectory(__DIR__ . '/foo/bar/baz', 3);
+            }
+        );
         static::assertSame(__DIR__, $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testNoParent(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getParentDirectory('/', 3);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getParentDirectory('/', 3);
+            }
+        );
         static::assertSame('/', $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testTooManyLevels(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getParentDirectory(__DIR__, 1000);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getParentDirectory(__DIR__, 1000);
+            }
+        );
         static::assertSame('/', $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 
     public function testEmptyPath(): void
     {
-        $this->enableTestErrorHandler();
-        $result = DirectoryUtils::getParentDirectory('', 1000);
-        $this->disableTestErrorHandler();
-
+        $result = $this->callPhpObjectMethod(
+            function (): string {
+                return DirectoryUtils::getParentDirectory('', 1000);
+            }
+        );
         static::assertSame('', $result);
-        static::assertNoPhpError($this->getLastPhpError());
     }
 }
