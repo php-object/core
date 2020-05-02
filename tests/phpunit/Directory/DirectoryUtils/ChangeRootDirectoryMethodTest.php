@@ -89,7 +89,7 @@ final class ChangeRootDirectoryMethodTest extends AbstractTestCase
                     E_WARNING,
                     'chroot(): No such file or directory (errno 2)',
                     DirectoryUtils::class,
-                    55
+                    56
                 );
                 static::assertNoPhpError($this->getLastPhpError());
 
