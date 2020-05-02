@@ -8,13 +8,13 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: Install Composer dependencies
                 command:
                     composer install --no-dev --ignore-platform-reqs --no-interaction
             - save_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
                 paths:
                     - vendor
 
@@ -25,7 +25,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: composer-require-checker
                 command: bin/ci/composerRequireChecker
@@ -47,7 +47,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: phpstan
                 command: bin/ci/phpstan-php-7-1
@@ -59,7 +59,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: phpstan
                 command: bin/ci/phpstan-php-7-2
@@ -71,7 +71,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: phpstan
                 command: bin/ci/phpstan-php-7-3
@@ -83,7 +83,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: phpstan
                 command: bin/ci/phpstan-php-7-4
@@ -95,7 +95,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: PHPUnit with PHP 7.1.0
                 command: bin/test/phpunit-php-7-1
@@ -107,7 +107,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                   name: PHPUnit with PHP 7.2.0
                   command: bin/test/phpunit-php-7-2
@@ -119,7 +119,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                   name: PHPUnit with PHP 7.3.0
                   command: bin/test/phpunit-php-7-3
@@ -131,7 +131,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-2
+                  key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                   name: PHPUnit with PHP 7.4.0
                   command: bin/test/phpunit-php-7-4
