@@ -10,55 +10,36 @@ use PhpObject\Core\{
     Tests\PhpUnit\AbstractTestCase
 };
 
-final class MoveMethodTest extends AbstractTestCase
+final class DeleteMethodTest extends AbstractTestCase
 {
-    public function testSourceExists(): void
+    public function testExistingDirectory(): void
     {
-        $source = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        mkdir($source);
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        mkdir($directory);
 
         $this->enableTestErrorHandler();
-        DirectoryUtils::move($source, $destination);
+        DirectoryUtils::delete($directory);
         $this->disableTestErrorHandler();
 
-        static::assertTrue(is_dir($destination));
+        static::assertFalse(is_dir($directory));
         static::assertNoPhpError($this->getLastPhpError());
     }
 
-    public function testDestinationExists(): void
+    public function testDirectoryNotFound(): void
     {
-        $source = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        mkdir($source);
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        mkdir($destination);
-
-        $this->enableTestErrorHandler();
-        DirectoryUtils::move($source, $destination);
-        $this->disableTestErrorHandler();
-
-        static::assertTrue(is_dir($destination));
-        // PHP documentation say an E_WARNING should be triggered in case of $destination alreay exists,
-        // but that's not the case.
-        static::assertNoPhpError($this->getLastPhpError());
-    }
-
-    public function testSourceNotFound(): void
-    {
-        $source = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
 
         $exceptionThrowned = false;
         $this->enableTestErrorHandler();
         try {
-            DirectoryUtils::move($source, $destination);
+            DirectoryUtils::delete($directory);
         } catch (DirectoryNotFoundException $exception) {
             $this->disableTestErrorHandler();
 
             static::assertException(
                 $exception,
                 DirectoryNotFoundException::class,
-                "Source directory \"$source\" not found."
+                "Directory \"$directory\" not found."
             );
             static::assertExceptionWithoutPhpError($exception);
 
@@ -69,55 +50,24 @@ final class MoveMethodTest extends AbstractTestCase
         static::assertNoPhpError($this->getLastPhpError());
     }
 
-    public function testDestinationParentNotFound(): void
-    {
-        $source = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        mkdir($source);
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-') . '/foo/bar/baz';
-        $destinationParent = dirname($destination);
-
-        $exceptionThrowned = false;
-        $this->enableTestErrorHandler();
-        try {
-            DirectoryUtils::move($source, $destination);
-        } catch (DirectoryNotFoundException $exception) {
-            $this->disableTestErrorHandler();
-
-            static::assertException(
-                $exception,
-                DirectoryNotFoundException::class,
-                "Destination parent directory \"$destinationParent\" not found.",
-                0
-            );
-            static::assertExceptionWithoutPhpError($exception);
-
-            $exceptionThrowned = true;
-        }
-
-        static::assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
-        static::assertNoPhpError($this->getLastPhpError());
-    }
-
     public function testFile(): void
     {
-        $sourceDirectory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        mkdir($sourceDirectory);
-        $source = "$sourceDirectory/foo";
-        touch($source);
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        mkdir($directory);
+        $file = "$directory/foo";
+        touch($file);
 
         $exceptionThrowned = false;
         $this->enableTestErrorHandler();
         try {
-            DirectoryUtils::move($source, $destination);
+            DirectoryUtils::delete($file);
         } catch (DirectoryNotFoundException $exception) {
             $this->disableTestErrorHandler();
 
             static::assertException(
                 $exception,
                 DirectoryNotFoundException::class,
-                "Source directory \"$source\" not found.",
-                0
+                "Directory \"$file\" not found."
             );
             static::assertExceptionWithoutPhpError($exception);
 
@@ -132,36 +82,48 @@ final class MoveMethodTest extends AbstractTestCase
     {
         $sourceDirectory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
         mkdir($sourceDirectory);
-        $symLink = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        symlink($sourceDirectory, $symLink);
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-
-        $this->enableTestErrorHandler();
-        DirectoryUtils::move($symLink, $destination);
-        $this->disableTestErrorHandler();
-
-        static::assertTrue(is_dir($destination));
-        static::assertNoPhpError($this->getLastPhpError());
-    }
-
-    public function testSymbolicLinkNotFound(): void
-    {
-        $source = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-        symlink($source, $destination);
+        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        symlink($sourceDirectory, $directory);
 
         $exceptionThrowned = false;
         $this->enableTestErrorHandler();
         try {
-            DirectoryUtils::move($source, $destination);
+            DirectoryUtils::delete($directory);
         } catch (DirectoryNotFoundException $exception) {
             $this->disableTestErrorHandler();
 
             static::assertException(
                 $exception,
                 DirectoryNotFoundException::class,
-                "Source directory \"$source\" not found.",
-                0
+                "Directory \"$directory\" is a symbolic link, "
+                    . 'use PhpObject\Core\Link\SymbolicLinkUtils::delete() to delete it.'
+            );
+            static::assertExceptionWithoutPhpError($exception);
+
+            $exceptionThrowned = true;
+        }
+
+        static::assertExceptionThrowned($exceptionThrowned, DirectoryNotFoundException::class);
+        static::assertNoPhpError($this->getLastPhpError());
+    }
+
+    public function testSymbolicLinkNotFound(): void
+    {
+        $directory = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        $destination = sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
+        symlink($directory, $destination);
+
+        $exceptionThrowned = false;
+        $this->enableTestErrorHandler();
+        try {
+            DirectoryUtils::delete($directory);
+        } catch (DirectoryNotFoundException $exception) {
+            $this->disableTestErrorHandler();
+
+            static::assertException(
+                $exception,
+                DirectoryNotFoundException::class,
+                "Directory \"$directory\" not found."
             );
             static::assertExceptionWithoutPhpError($exception);
 

@@ -7,21 +7,22 @@ namespace PhpObject\Core\Directory;
 use PhpObject\Core\{
     ErrorHandler\PhpObjectErrorHandlerManager,
     Exception\Directory\DirectoryNotFoundException,
-    Exception\PhpObjectException
+    Exception\PhpObjectException,
+    Link\SymbolicLinkUtils
 };
 
 class DirectoryUtils
 {
     /** @link https://www.php.net/manual/en/function.chdir.php */
-    public static function changeWorkingDirectory(string $directory): void
+    public static function changeWorkingDirectory(string $path): void
     {
         PhpObjectErrorHandlerManager::enable();
-        $executed = chdir($directory);
+        $executed = chdir($path);
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
             throw new DirectoryNotFoundException(
-                DirectoryNotFoundException::createDefaultMessage($directory),
+                DirectoryNotFoundException::createDefaultMessage($path),
                 $lastError
             );
         }
@@ -49,15 +50,15 @@ class DirectoryUtils
     }
 
     /** @link https://www.php.net/manual/en/function.chroot.php */
-    public static function changeRootDirectory(string $directory): void
+    public static function changeRootDirectory(string $path): void
     {
         PhpObjectErrorHandlerManager::enable();
-        $executed = chroot($directory);
+        $executed = chroot($path);
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
             throw new DirectoryNotFoundException(
-                DirectoryNotFoundException::createDefaultMessage($directory),
+                DirectoryNotFoundException::createDefaultMessage($path),
                 $lastError
             );
         }
@@ -103,17 +104,53 @@ class DirectoryUtils
             );
         }
 
-        PhpObjectErrorHandlerManager::enable();
         // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
         if ($context === null) {
+            PhpObjectErrorHandlerManager::enable();
             $result = rename($source, $destination);
+            $lastError = PhpObjectErrorHandlerManager::disable();
         } else {
+            PhpObjectErrorHandlerManager::enable();
             $result = rename($source, $destination, $context);
+            $lastError = PhpObjectErrorHandlerManager::disable();
         }
-        $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($result !== true) {
             throw new PhpObjectException("Directory \"$source\" cannot be moved to \"$destination\".", $lastError);
+        }
+
+        PhpObjectErrorHandlerManager::assertNoError();
+    }
+
+    /**
+     * @param resource|null $context
+     * @link https://www.php.net/manual/en/function.rmdir.php
+     */
+    public static function delete(string $path, $context = null): void
+    {
+        if (SymbolicLinkUtils::isSymbolicLink($path) === true) {
+            throw new DirectoryNotFoundException(
+                "Directory \"$path\" is a symbolic link, use " . SymbolicLinkUtils::class . '::delete() to delete it.'
+            );
+        }
+
+        if (static::isDirectory($path) === false) {
+            throw new DirectoryNotFoundException(DirectoryNotFoundException::createDefaultMessage($path));
+        }
+
+        // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
+        if ($context === null) {
+            PhpObjectErrorHandlerManager::enable();
+            $result = rmdir($path);
+            $lastError = PhpObjectErrorHandlerManager::disable();
+        } else {
+            PhpObjectErrorHandlerManager::enable();
+            $result = rmdir($path, $context);
+            $lastError = PhpObjectErrorHandlerManager::disable();
+        }
+
+        if ($result !== true) {
+            throw new PhpObjectException("Directory \"$path\" cannot be deleted.", $lastError);
         }
 
         PhpObjectErrorHandlerManager::assertNoError();

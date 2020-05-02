@@ -53,7 +53,7 @@ final class ChangeWorkingDirectoryMethodTest extends AbstractTestCase
                 E_WARNING,
                 'chdir(): No such file or directory (errno 2)',
                 DirectoryUtils::class,
-                19
+                20
             );
             static::assertNoPhpError($this->getLastPhpError());
 

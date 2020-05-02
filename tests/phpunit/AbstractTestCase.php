@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractTestCase extends TestCase
 {
-    public static function assertException(\Throwable $exception, string $class, string $error, int $code): void
+    public static function assertException(\Throwable $exception, string $class, string $error, int $code = 0): void
     {
         static::assertInstanceOf($class, $exception);
         static::assertEquals($error, $exception->getMessage());
