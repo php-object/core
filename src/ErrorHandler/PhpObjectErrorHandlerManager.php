@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpObject\Core\ErrorHandler;
 
-use PhpObject\Core\Exception\PhpObjectException;
+use PhpObject\Core\Exception\ErrorHandler\PhpErrorException;
 
 class PhpObjectErrorHandlerManager
 {
@@ -39,10 +39,8 @@ class PhpObjectErrorHandlerManager
         if (static::$errorHandledEnabled === true) {
             restore_error_handler();
             static::$errorHandledEnabled = false;
-            $return = static::getLastError();
-            static::$lastError = null;
 
-            return $return;
+            return static::getLastError();
         }
 
         return null;
@@ -62,7 +60,7 @@ class PhpObjectErrorHandlerManager
                 && $lastError->getNumber() !== E_USER_DEPRECATED
             )
         ) {
-            throw new PhpObjectException('A PHP error has been triggered.', $lastError);
+            throw new PhpErrorException($lastError);
         }
     }
 }

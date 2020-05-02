@@ -78,14 +78,18 @@ final class ChangeRootDirectoryMethodTest extends AbstractTestCase
             } catch (DirectoryNotFoundException $exception) {
                 $this->disableTestErrorHandler();
 
-                static::assertPhpErrorException(
+                static::assertException(
                     $exception,
+                    DirectoryNotFoundException::class,
                     'Directory "/foo" not found.',
-                    0,
+                    0
+                );
+                static::assertExceptionWithPhpError(
+                    $exception,
                     E_WARNING,
                     'chroot(): No such file or directory (errno 2)',
                     DirectoryUtils::class,
-                    52
+                    55
                 );
                 static::assertNoPhpError($this->getLastPhpError());
 
