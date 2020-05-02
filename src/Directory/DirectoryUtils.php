@@ -70,14 +70,11 @@ class DirectoryUtils
         return $return;
     }
 
-    /**
-     * @link https://www.php.net/manual/en/function.file-exists.php
-     * @link https://www.php.net/manual/en/function.is-dir.php
-     */
-    public static function exists(string $directory): bool
+    /** @link https://www.php.net/manual/en/function.is-dir.php */
+    public static function isDirectory(string $path): bool
     {
         PhpObjectErrorHandlerManager::enable();
-        $return = file_exists($directory) && is_dir($directory);
+        $return = is_dir($path);
         PhpObjectErrorHandlerManager::disable();
         PhpObjectErrorHandlerManager::assertNoError();
 
