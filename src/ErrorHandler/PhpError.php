@@ -22,8 +22,13 @@ class PhpError
     protected $context;
 
     /** @param array<mixed>|null $context */
-    public function __construct(int $number, string $error, ?string $file, ?int $line, ?array $context)
-    {
+    public function __construct(
+        int $number,
+        string $error,
+        string $file = null,
+        int $line = null,
+        array $context = null
+    ) {
         $this->number = $number;
         $this->error = $error;
         $this->file = $file;
