@@ -9,7 +9,9 @@ parameters:
     ignoreErrors:
         # I think new static() is a good way to instantiate self in static method.
         # new self() will not take into account child classes.
-        - '#Unsafe usage of new static().#'
+        - "#^Unsafe usage of new static().#"
+        # https://github.com/phpstan/phpstan/issues/3232
+        - "#^Result of function rewinddir#"
 includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
     - /root/.composer/vendor/phpstan/phpstan-strict-rules/rules.neon

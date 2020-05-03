@@ -14,12 +14,13 @@ class CreateFromPathMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
+        /** @var DirectoryManager $manager */
         $manager = $this->callPhpObjectMethod(
             function (): DirectoryManager {
                 return DirectoryManager::createFromPath(__DIR__);
             }
         );
-        static::assertIsResource($manager->getHandle());
+        static::assertIsOpenResource($manager->getResource());
     }
 
     public function testDirectoryNotFound(): void
@@ -38,12 +39,13 @@ class CreateFromPathMethodTest extends AbstractTestCase
         $symbolicLink = $this->getTemporaryDirectory();
         symlink(__DIR__, $symbolicLink);
 
+        /** @var DirectoryManager $manager */
         $manager = $this->callPhpObjectMethod(
             function () use ($symbolicLink): DirectoryManager {
                 return DirectoryManager::createFromPath($symbolicLink);
             }
         );
-        static::assertIsResource($manager->getHandle());
+        static::assertIsOpenResource($manager->getResource());
     }
 
     public function testSymbolicLinkNotFound(): void

@@ -6,7 +6,9 @@ namespace PhpObject\Core\Directory;
 
 use PhpObject\Core\{
     ErrorHandler\PhpObjectErrorHandlerManager,
+    Exception\PhpObjectException,
     Exception\Variable\ResourceExpectedException,
+    Exception\Variable\ResourceIsClosedException,
     Variable\ResourceUtils
 };
 
@@ -38,19 +40,102 @@ class DirectoryManager
     }
 
     /** @var resource */
-    protected $handle;
+    protected $resource;
 
-    /** @param resource $handle */
-    public function __construct($handle)
+    /** @param resource $resource */
+    public function __construct($resource)
     {
-        ResourceUtils::assertIsResource($handle, ResourceExpectedException::createDefaultMessage('handle', $handle));
+        ResourceUtils::assertIsResource(
+            $resource,
+            ResourceExpectedException::createDefaultMessage('resource', $resource)
+        );
 
-        $this->handle = $handle;
+        $this->resource = $resource;
+    }
+
+    public function __destruct()
+    {
+        if ($this->isOpen() === true) {
+            $this->close();
+        }
     }
 
     /** @return resource */
-    public function getHandle()
+    public function getResource()
     {
-        return $this->handle;
+        return $this->resource;
+    }
+
+    public function isOpen(): bool
+    {
+        return ResourceUtils::isResource($this->getResource());
+    }
+
+    public function assertIsOpen(): self
+    {
+        if ($this->isOpen() === false) {
+            throw new ResourceIsClosedException(ResourceIsClosedException::createDefaultMessage('resource'));
+        }
+
+        return $this;
+    }
+
+    /** @link https://www.php.net/manual/en/function.readdir.php */
+    public function getNext(): ?string
+    {
+        $this->assertIsOpen();
+
+        PhpObjectErrorHandlerManager::enable();
+        $return = readdir($this->getResource());
+        PhpObjectErrorHandlerManager::disable();
+
+        PhpObjectErrorHandlerManager::assertNoError();
+
+        return $return === false ? null : $return;
+    }
+
+    /** @link https://www.php.net/manual/en/function.readdir.php */
+    public function getNextFileOrDirectory(): ?string
+    {
+        $this->assertIsOpen();
+
+        $return = $this->getNext();
+        while ($return === '.' || $return === '..') {
+            $return = $this->getNext();
+        }
+
+        return $return;
+    }
+
+    /** @link https://www.php.net/manual/en/function.rewinddir.php */
+    public function reset(): self
+    {
+        $this->assertIsOpen();
+
+        PhpObjectErrorHandlerManager::enable();
+        /** @var null|false $result */
+        $result = rewinddir($this->getResource());
+        $lastError = PhpObjectErrorHandlerManager::disable();
+
+        if ($result !== null) {
+            throw new PhpObjectException('Error while resetting directory handle.', $lastError);
+        }
+
+        PhpObjectErrorHandlerManager::assertNoError();
+
+        return $this;
+    }
+
+    /** @link https://www.php.net/manual/en/function.closedir.php */
+    public function close(): self
+    {
+        $this->assertIsOpen();
+
+        PhpObjectErrorHandlerManager::enable();
+        closedir($this->getResource());
+        PhpObjectErrorHandlerManager::disable();
+        PhpObjectErrorHandlerManager::assertNoError();
+
+        return $this;
     }
 }

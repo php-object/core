@@ -6,13 +6,14 @@ namespace PhpObject\Core\Tests\PhpUnit;
 
 use PhpObject\Core\{
     ErrorHandler\PhpError,
-    Exception\PhpObjectException
+    Exception\PhpObjectException,
+    Variable\ResourceUtils
 };
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractTestCase extends TestCase
 {
-    public static function assertException(\Throwable $exception, string $class, string $error, int $code = 0): void
+    protected static function assertException(\Throwable $exception, string $class, string $error, int $code = 0): void
     {
         static::assertInstanceOf($class, $exception);
         static::assertEquals($error, $exception->getMessage());
@@ -20,7 +21,7 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /** @param class-string $class */
-    public static function assertExceptionWithPhpError(
+    protected static function assertExceptionWithPhpError(
         PhpObjectException $exception,
         int $number,
         string $error,
@@ -37,14 +38,26 @@ abstract class AbstractTestCase extends TestCase
         static::assertSame($line, $exception->getPhpError()->getLine());
     }
 
-    public static function assertExceptionWithoutPhpError(PhpObjectException $exception): void
+    protected static function assertExceptionWithoutPhpError(PhpObjectException $exception): void
     {
         static::assertNull($exception->getPhpError(), 'Exception contains a PHP error but no one was expected.');
     }
 
-    public static function assertNoPhpError(?PhpError $phpError): void
+    protected static function assertNoPhpError(?PhpError $phpError): void
     {
         static::assertNull($phpError, 'A PHP error has been triggered but no one was expected.');
+    }
+
+    /** @param mixed $resource */
+    protected static function assertIsOpenResource($resource): void
+    {
+        static::assertTrue(ResourceUtils::isOpen($resource), 'Resource is not closed.');
+    }
+
+    /** @param mixed $resource */
+    protected static function assertIsClosedResource($resource): void
+    {
+        static::assertTrue(ResourceUtils::isClosed($resource), 'Resource is not closed.');
     }
 
     /** @var PhpError|null */
@@ -136,25 +149,5 @@ abstract class AbstractTestCase extends TestCase
     protected function getTemporaryDirectory(): string
     {
         return sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
-    }
-
-    protected function isPhp71(): bool
-    {
-        return version_compare(PHP_VERSION, '7.1.0') === 0;
-    }
-
-    protected function isPhp72(): bool
-    {
-        return version_compare(PHP_VERSION, '7.2.0') === 0;
-    }
-
-    protected function isPhp73(): bool
-    {
-        return version_compare(PHP_VERSION, '7.3.0') === 0;
-    }
-
-    protected function isPhp74(): bool
-    {
-        return version_compare(PHP_VERSION, '7.4.0') === 0;
     }
 }

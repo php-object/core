@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace PhpObject\Core\Tests\PhpUnit\Variable\ResourceUtils;
 
-use PhpObject\Core\{
-    Exception\Variable\ResourceExpectedException,
+use PhpObject\Core\{Exception\Variable\ResourceExpectedException,
     Tests\PhpUnit\AbstractTestCase,
-    Variable\ResourceUtils
-};
+    Variable\ResourceUtils,
+    Version\PhpVersionUtils};
 
 final class AssertIsResourceMethodTest extends AbstractTestCase
 {
     public function testIsResource(): void
     {
-        $handle = fopen(__FILE__, 'r');
+        $resource = fopen(__FILE__, 'r');
 
         $this->callPhpObjectMethod(
-            function () use ($handle): void {
+            function () use ($resource): void {
                 ResourceUtils::assertIsResource(
-                    $handle,
-                    ResourceExpectedException::createDefaultMessage('handle', $handle)
+                    $resource,
+                    ResourceExpectedException::createDefaultMessage('resource', $resource)
                 );
             }
         );
@@ -29,39 +28,39 @@ final class AssertIsResourceMethodTest extends AbstractTestCase
 
     public function testNotResource(): void
     {
-        $handle = 'foo';
+        $resource = 'foo';
 
         $this->assertExceptionIsThrowned(
-            function () use ($handle): void {
+            function () use ($resource): void {
                 ResourceUtils::assertIsResource(
-                    $handle,
-                    ResourceExpectedException::createDefaultMessage('handle', $handle)
+                    $resource,
+                    ResourceExpectedException::createDefaultMessage('resource', $resource)
                 );
             },
             ResourceExpectedException::class,
-            'Variable "$handle" should be a valid resource but is of type string.'
+            'Variable "$resource" should be a valid resource but is of type string.'
         );
     }
 
     public function testClosedResource(): void
     {
-        $handle = fopen(__FILE__, 'r');
-        if (is_resource($handle) === false) {
+        $resource = fopen(__FILE__, 'r');
+        if (is_resource($resource) === false) {
             static::fail('Unable to open ' . __FILE__ . ' for reading.');
         }
-        fclose($handle);
+        fclose($resource);
 
         $this->assertExceptionIsThrowned(
-            function () use ($handle): void {
+            function () use ($resource): void {
                 ResourceUtils::assertIsResource(
-                    $handle,
-                    ResourceExpectedException::createDefaultMessage('handle', $handle)
+                    $resource,
+                    ResourceExpectedException::createDefaultMessage('resource', $resource)
                 );
             },
             ResourceExpectedException::class,
-            $this->isPhp71()
-                ? 'Variable "$handle" should be a valid resource but is of type unknown type.'
-                : 'Variable "$handle" should be a valid resource but is of type resource (closed).'
+            PhpVersionUtils::is71()
+                ? 'Variable "$resource" should be a valid resource but is of type unknown type.'
+                : 'Variable "$resource" should be a valid resource but is of type resource (closed).'
         );
     }
 }
