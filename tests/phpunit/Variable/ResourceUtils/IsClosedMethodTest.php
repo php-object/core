@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace PhpObject\Core\Tests\PhpUnit\Variable\ResourceUtils;
 
 use PhpObject\Core\{
+    Exception\Variable\ResourceExpectedException,
     Tests\PhpUnit\AbstractTestCase,
     Variable\ResourceUtils
 };
 
-class IsResourceMethodTest extends AbstractTestCase
+class IsClosedMethodTest extends AbstractTestCase
 {
-    public function testTrue(): void
+    public function testOpen(): void
     {
         $resource = fopen(__FILE__, 'r');
         if (is_resource($resource) === false) {
@@ -20,38 +21,40 @@ class IsResourceMethodTest extends AbstractTestCase
 
         $result = $this->callPhpObjectMethod(
             function () use ($resource): bool {
-                return ResourceUtils::isResource($resource);
+                return ResourceUtils::isClosed($resource);
             }
         );
 
         fclose($resource);
+
+        static::assertFalse($result);
+    }
+
+    public function testClosed(): void
+    {
+        $resource = fopen(__FILE__, 'r');
+        if (is_resource($resource) === false) {
+            static::fail('Unable to open ' . __FILE__ . ' for reading.');
+        }
+        fclose($resource);
+
+        $result = $this->callPhpObjectMethod(
+            function () use ($resource): bool {
+                return ResourceUtils::isClosed($resource);
+            }
+        );
 
         static::assertTrue($result);
     }
 
-    public function testFalse(): void
+    public function testInvalidType(): void
     {
-        $result = $this->callPhpObjectMethod(
+        $this->assertExceptionIsThrowned(
             function (): bool {
-                return ResourceUtils::isResource('foo');
-            }
+                return ResourceUtils::isClosed('foo');
+            },
+            ResourceExpectedException::class,
+            'Variable "$resource" should be a valid resource but is of type string.'
         );
-        static::assertFalse($result);
-    }
-
-    public function testClosedResource(): void
-    {
-        $resource = fopen(__FILE__, 'r');
-        if (is_resource($resource) === false) {
-            static::fail('Unable to open ' . __FILE__ . ' for reading.');
-        }
-        fclose($resource);
-
-        $result = $this->callPhpObjectMethod(
-            function () use ($resource): bool {
-                return ResourceUtils::isResource($resource);
-            }
-        );
-        static::assertFalse($result);
     }
 }

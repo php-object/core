@@ -6,7 +6,8 @@ namespace PhpObject\Core\Tests\PhpUnit\Variable\VariableUtils;
 
 use PhpObject\Core\{
     Tests\PhpUnit\AbstractTestCase,
-    Variable\VariableUtils
+    Variable\VariableUtils,
+    Version\PhpVersionUtils
 };
 
 class GetTypeMethodTest extends AbstractTestCase
@@ -48,27 +49,27 @@ class GetTypeMethodTest extends AbstractTestCase
 
     public function testResource(): void
     {
-        $handle = fopen(__FILE__, 'r');
-        if (is_resource($handle) === false) {
+        $resource = fopen(__FILE__, 'r');
+        if (is_resource($resource) === false) {
             static::fail('Unable to open ' . __FILE__ . ' for reading.');
         }
 
-        $this->assertGetType($handle, VariableUtils::TYPE_RESOURCE);
-        fclose($handle);
+        $this->assertGetType($resource, VariableUtils::TYPE_RESOURCE);
+        fclose($resource);
     }
 
     public function testClosedResource(): void
     {
-        $handle = fopen(__FILE__, 'r');
-        if (is_resource($handle) === false) {
+        $resource = fopen(__FILE__, 'r');
+        if (is_resource($resource) === false) {
             static::fail('Unable to open ' . __FILE__ . ' for reading.');
         }
-        fclose($handle);
+        fclose($resource);
 
-        if ($this->isPhp71() === true) {
-            $this->assertGetType($handle, VariableUtils::TYPE_UNKNOWN_TYPE);
+        if (PhpVersionUtils::is71() === true) {
+            $this->assertGetType($resource, VariableUtils::TYPE_UNKNOWN_TYPE);
         } else {
-            $this->assertGetType($handle, VariableUtils::TYPE_CLOSED_RESOURCE);
+            $this->assertGetType($resource, VariableUtils::TYPE_CLOSED_RESOURCE);
         }
     }
 
