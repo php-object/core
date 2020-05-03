@@ -35,6 +35,10 @@ for param in "$@"; do
     fi
 done
 
+if [ ${verbosityLevel} -ge 1 ]; then
+    outputRedirect="/proc/self/fd/0"
+fi
+
 echo -e "\e[32mphpcs\e[0m."
 ${rootDirectory}/bin/ci/phpcs > ${outputRedirect} 2>&1
 validateExitCode "$?"
