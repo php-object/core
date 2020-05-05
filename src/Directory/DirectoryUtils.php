@@ -8,23 +8,24 @@ use PhpObject\Core\{
     ErrorHandler\PhpObjectErrorHandlerManager,
     Exception\Directory\DirectoryNotFoundException,
     Exception\PhpObjectException,
-    Link\SymbolicLinkUtils
+    Link\SymbolicLinkUtils,
+    Path\PathUtils
 };
 
 class DirectoryUtils
 {
     /** @link https://www.php.net/manual/en/function.chdir.php */
-    public static function changeWorkingDirectory(string $path): void
+    public static function changeWorkingDirectory(string $directory): void
     {
-        static::assertIsDirectory($path);
+        PathUtils::assertIsDirectory($directory);
 
         PhpObjectErrorHandlerManager::enable();
-        $executed = chdir($path);
+        $executed = chdir($directory);
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
             throw new PhpObjectException(
-                "Error while changing working directory to \"$path\".",
+                "Error while changing working directory to \"$directory\".",
                 $lastError
             );
         }
@@ -52,17 +53,17 @@ class DirectoryUtils
     }
 
     /** @link https://www.php.net/manual/en/function.chroot.php */
-    public static function changeRootDirectory(string $path): void
+    public static function changeRootDirectory(string $directory): void
     {
-        static::assertIsDirectory($path);
+        PathUtils::assertIsDirectory($directory);
 
         PhpObjectErrorHandlerManager::enable();
-        $executed = chroot($path);
+        $executed = chroot($directory);
         $lastError = PhpObjectErrorHandlerManager::disable();
 
         if ($executed === false) {
             throw new PhpObjectException(
-                "Error while changing root directory to \"$path\".",
+                "Error while changing root directory to \"$directory\".",
                 $lastError
             );
         }
@@ -71,34 +72,14 @@ class DirectoryUtils
     }
 
     /** @link https://www.php.net/manual/en/function.dirname.php */
-    public static function getParentDirectory(string $path, int $levels = 1): string
+    public static function getParentDirectory(string $directory, int $levels = 1): string
     {
         PhpObjectErrorHandlerManager::enable();
-        $return = dirname($path, $levels);
+        $return = dirname($directory, $levels);
         PhpObjectErrorHandlerManager::disable();
         PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
-    }
-
-    /** @link https://www.php.net/manual/en/function.is-dir.php */
-    public static function isDirectory(string $path): bool
-    {
-        PhpObjectErrorHandlerManager::enable();
-        $return = is_dir($path);
-        PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
-
-        return $return;
-    }
-
-    public static function assertIsDirectory(string $path, string $errorMessage = null): void
-    {
-        if (static::isDirectory($path) === false) {
-            throw new DirectoryNotFoundException(
-                $errorMessage ?? DirectoryNotFoundException::createDefaultMessage($path)
-            );
-        }
     }
 
     /**
@@ -107,9 +88,9 @@ class DirectoryUtils
      */
     public static function move(string $source, string $destination, $context = null): void
     {
-        static::assertIsDirectory($source, "Source directory \"$source\" not found.");
+        PathUtils::assertIsDirectory($source, "Source directory \"$source\" not found.");
         $destinationParentDirectory = static::getParentDirectory($destination);
-        static::assertIsDirectory(
+        PathUtils::assertIsDirectory(
             $destinationParentDirectory,
             "Destination parent directory \"$destinationParentDirectory\" not found."
         );
@@ -136,29 +117,31 @@ class DirectoryUtils
      * @param resource|null $context
      * @link https://www.php.net/manual/en/function.rmdir.php
      */
-    public static function delete(string $path, $context = null): void
+    public static function delete(string $directory, $context = null): void
     {
-        if (SymbolicLinkUtils::isSymbolicLink($path) === true) {
+        if (SymbolicLinkUtils::isSymbolicLink($directory) === true) {
             throw new DirectoryNotFoundException(
-                "Directory \"$path\" is a symbolic link, use " . SymbolicLinkUtils::class . '::delete() to delete it.'
+                "Directory \"$directory\" is a symbolic link, use "
+                    . SymbolicLinkUtils::class
+                    . '::delete() to delete it.'
             );
         }
 
-        static::assertIsDirectory($path);
+        PathUtils::assertIsDirectory($directory);
 
         // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
         if ($context === null) {
             PhpObjectErrorHandlerManager::enable();
-            $result = rmdir($path);
+            $result = rmdir($directory);
             $lastError = PhpObjectErrorHandlerManager::disable();
         } else {
             PhpObjectErrorHandlerManager::enable();
-            $result = rmdir($path, $context);
+            $result = rmdir($directory, $context);
             $lastError = PhpObjectErrorHandlerManager::disable();
         }
 
         if ($result !== true) {
-            throw new PhpObjectException("Directory \"$path\" cannot be deleted.", $lastError);
+            throw new PhpObjectException("Directory \"$directory\" cannot be deleted.", $lastError);
         }
 
         PhpObjectErrorHandlerManager::assertNoError();

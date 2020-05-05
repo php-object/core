@@ -9,6 +9,7 @@ use PhpObject\Core\{
     Exception\PhpObjectException,
     Exception\Variable\ResourceExpectedException,
     Exception\Variable\ResourceIsClosedException,
+    Path\PathUtils,
     Variable\ResourceUtils
 };
 
@@ -20,7 +21,7 @@ class DirectoryManager
      */
     public static function createFromPath(string $path, $context = null): self
     {
-        DirectoryUtils::assertIsDirectory($path);
+        PathUtils::assertIsDirectory($path);
 
         // PHP 7.1 and 7.2 do not allow null for $context: if no value, you should not pass this argument
         if ($context === null) {

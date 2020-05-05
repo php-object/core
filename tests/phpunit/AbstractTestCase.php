@@ -146,7 +146,7 @@ abstract class AbstractTestCase extends TestCase
         return $return;
     }
 
-    protected function getTemporaryDirectory(): string
+    protected function getTemporaryPath(): string
     {
         return sys_get_temp_dir() . '/' . uniqid('php-object-phpunit-');
     }
