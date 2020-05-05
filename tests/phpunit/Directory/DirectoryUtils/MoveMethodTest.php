@@ -14,9 +14,9 @@ final class MoveMethodTest extends AbstractTestCase
 {
     public function testSourceExists(): void
     {
-        $source = $this->getTemporaryDirectory();
+        $source = $this->getTemporaryPath();
         mkdir($source);
-        $destination = $this->getTemporaryDirectory();
+        $destination = $this->getTemporaryPath();
 
         $this->callPhpObjectMethod(
             function () use ($source, $destination): void {
@@ -28,9 +28,9 @@ final class MoveMethodTest extends AbstractTestCase
 
     public function testDestinationExists(): void
     {
-        $source = $this->getTemporaryDirectory();
+        $source = $this->getTemporaryPath();
         mkdir($source);
-        $destination = $this->getTemporaryDirectory();
+        $destination = $this->getTemporaryPath();
         mkdir($destination);
 
         // PHP documentation say an E_WARNING should be triggered in case of $destination already exists,
@@ -45,8 +45,8 @@ final class MoveMethodTest extends AbstractTestCase
 
     public function testSourceNotFound(): void
     {
-        $source = $this->getTemporaryDirectory();
-        $destination = $this->getTemporaryDirectory();
+        $source = $this->getTemporaryPath();
+        $destination = $this->getTemporaryPath();
 
         $this->assertExceptionIsThrowned(
             function () use ($source, $destination): void {
@@ -59,9 +59,9 @@ final class MoveMethodTest extends AbstractTestCase
 
     public function testDestinationParentNotFound(): void
     {
-        $source = $this->getTemporaryDirectory();
+        $source = $this->getTemporaryPath();
         mkdir($source);
-        $destination = $this->getTemporaryDirectory() . '/foo/bar/baz';
+        $destination = $this->getTemporaryPath() . '/foo/bar/baz';
         $destinationParent = dirname($destination);
 
         $this->assertExceptionIsThrowned(
@@ -75,11 +75,11 @@ final class MoveMethodTest extends AbstractTestCase
 
     public function testFile(): void
     {
-        $sourceDirectory = $this->getTemporaryDirectory();
+        $sourceDirectory = $this->getTemporaryPath();
         mkdir($sourceDirectory);
         $source = "$sourceDirectory/foo";
         touch($source);
-        $destination = $this->getTemporaryDirectory();
+        $destination = $this->getTemporaryPath();
 
         $this->assertExceptionIsThrowned(
             function () use ($source, $destination): void {
@@ -92,11 +92,11 @@ final class MoveMethodTest extends AbstractTestCase
 
     public function testSymbolicLink(): void
     {
-        $sourceDirectory = $this->getTemporaryDirectory();
+        $sourceDirectory = $this->getTemporaryPath();
         mkdir($sourceDirectory);
-        $symbolicLink = $this->getTemporaryDirectory();
+        $symbolicLink = $this->getTemporaryPath();
         symlink($sourceDirectory, $symbolicLink);
-        $destination = $this->getTemporaryDirectory();
+        $destination = $this->getTemporaryPath();
 
         $this->callPhpObjectMethod(
             function () use ($symbolicLink, $destination): void {
@@ -108,8 +108,8 @@ final class MoveMethodTest extends AbstractTestCase
 
     public function testSymbolicLinkNotFound(): void
     {
-        $source = $this->getTemporaryDirectory();
-        $destination = $this->getTemporaryDirectory();
+        $source = $this->getTemporaryPath();
+        $destination = $this->getTemporaryPath();
         symlink($source, $destination);
 
         $this->assertExceptionIsThrowned(

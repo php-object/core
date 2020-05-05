@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace PhpObject\Core\Tests\PhpUnit\Path\PathUtils;
 
-use PhpObject\Core\Path\PathUtils;
+use PhpObject\Core\{
+    Path\PathUtils,
+    Tests\PhpUnit\AbstractTestCase
+};
 
-final class GetBaseNameMethodTest extends \PhpObject\Core\Tests\PhpUnit\AbstractTestCase
+final class GetBaseNameMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {

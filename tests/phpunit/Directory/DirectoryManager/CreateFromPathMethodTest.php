@@ -36,7 +36,7 @@ class CreateFromPathMethodTest extends AbstractTestCase
 
     public function testExistingSymbolicLink(): void
     {
-        $symbolicLink = $this->getTemporaryDirectory();
+        $symbolicLink = $this->getTemporaryPath();
         symlink(__DIR__, $symbolicLink);
 
         /** @var DirectoryManager $manager */
@@ -50,7 +50,7 @@ class CreateFromPathMethodTest extends AbstractTestCase
 
     public function testSymbolicLinkNotFound(): void
     {
-        $symbolicLink = $this->getTemporaryDirectory();
+        $symbolicLink = $this->getTemporaryPath();
         symlink(__DIR__ . '/foo', $symbolicLink);
 
         $this->assertExceptionIsThrowned(

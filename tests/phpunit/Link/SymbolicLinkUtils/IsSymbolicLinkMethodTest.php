@@ -13,7 +13,7 @@ final class IsSymbolicLinkMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
 
         $result = $this->callPhpObjectMethod(
@@ -26,7 +26,7 @@ final class IsSymbolicLinkMethodTest extends AbstractTestCase
 
     public function testDirectoryNotFound(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
 
         $result = $this->callPhpObjectMethod(
             function () use ($directory): bool {
@@ -38,9 +38,9 @@ final class IsSymbolicLinkMethodTest extends AbstractTestCase
 
     public function testExistingSymbolicLink(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
-        $symbolicLink = $this->getTemporaryDirectory();
+        $symbolicLink = $this->getTemporaryPath();
         symlink($directory, $symbolicLink);
 
         $result = $this->callPhpObjectMethod(
@@ -53,9 +53,9 @@ final class IsSymbolicLinkMethodTest extends AbstractTestCase
 
     public function testSymbolicLinkNotFound(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
-        $symbolicLink = $this->getTemporaryDirectory();
+        $symbolicLink = $this->getTemporaryPath();
 
         $result = $this->callPhpObjectMethod(
             function () use ($symbolicLink): bool {

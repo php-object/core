@@ -14,7 +14,7 @@ final class DeleteMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
 
         $this->callPhpObjectMethod(
@@ -27,7 +27,7 @@ final class DeleteMethodTest extends AbstractTestCase
 
     public function testDirectoryNotFound(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
 
         $this->assertExceptionIsThrowned(
             function () use ($directory): void {
@@ -40,7 +40,7 @@ final class DeleteMethodTest extends AbstractTestCase
 
     public function testFile(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
         $file = "$directory/foo";
         touch($file);
@@ -56,9 +56,9 @@ final class DeleteMethodTest extends AbstractTestCase
 
     public function testSymbolicLink(): void
     {
-        $sourceDirectory = $this->getTemporaryDirectory();
+        $sourceDirectory = $this->getTemporaryPath();
         mkdir($sourceDirectory);
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         symlink($sourceDirectory, $directory);
 
         $this->assertExceptionIsThrowned(
@@ -73,8 +73,8 @@ final class DeleteMethodTest extends AbstractTestCase
 
     public function testSymbolicLinkNotFound(): void
     {
-        $directory = $this->getTemporaryDirectory();
-        $destination = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
+        $destination = $this->getTemporaryPath();
         symlink($directory, $destination);
 
         $this->assertExceptionIsThrowned(

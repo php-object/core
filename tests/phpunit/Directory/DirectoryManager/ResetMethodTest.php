@@ -13,7 +13,7 @@ class ResetMethodTest extends AbstractTestCase
 {
     public function testExistingDirectory(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
         touch("$directory/a.file");
         touch("$directory/b.file");
@@ -43,12 +43,12 @@ class ResetMethodTest extends AbstractTestCase
 
     public function testExistingSymbolicLink(): void
     {
-        $directory = $this->getTemporaryDirectory();
+        $directory = $this->getTemporaryPath();
         mkdir($directory);
         touch("$directory/a.file");
         touch("$directory/b.file");
         touch("$directory/c.file");
-        $symbolicLink = $this->getTemporaryDirectory();
+        $symbolicLink = $this->getTemporaryPath();
         symlink($directory, $symbolicLink);
 
         /** @var DirectoryManager $manager */

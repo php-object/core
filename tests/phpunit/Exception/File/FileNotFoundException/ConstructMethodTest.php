@@ -2,23 +2,15 @@
 
 declare(strict_types=1);
 
-namespace PhpObject\Core\Tests\PhpUnit\Exception\Directory;
+namespace PhpObject\Core\Tests\PhpUnit\Exception\File\FileNotFoundException;
 
 use PhpObject\Core\{
     Exception\Directory\DirectoryNotFoundException,
     Tests\PhpUnit\Exception\AbstractPhpObjectExceptionTest
 };
 
-class DirectoryNotFoundExceptionTest extends AbstractPhpObjectExceptionTest
+class ConstructMethodTest extends AbstractPhpObjectExceptionTest
 {
-    public function testCreateDefaultMessage(): void
-    {
-        static::assertSame(
-            DirectoryNotFoundException::createDefaultMessage('foo'),
-            'Directory "foo" not found.'
-        );
-    }
-
     public function testDefaultValues(): void
     {
         static::assertExceptionDefaultValues(new DirectoryNotFoundException(static::EXCEPTION_MESSAGE));

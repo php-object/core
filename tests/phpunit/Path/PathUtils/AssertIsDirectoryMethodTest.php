@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PhpObject\Core\Tests\PhpUnit\Directory\DirectoryUtils;
+namespace PhpObject\Core\Tests\PhpUnit\Path\PathUtils;
 
 use PhpObject\Core\{
-    Directory\DirectoryUtils,
     Exception\Directory\DirectoryNotFoundException,
+    Path\PathUtils,
     Tests\PhpUnit\AbstractTestCase
 };
 
@@ -18,7 +18,7 @@ final class AssertIsDirectoryMethodTest extends AbstractTestCase
 
         $this->callPhpObjectMethod(
             function () use ($directory): void {
-                DirectoryUtils::assertIsDirectory($directory);
+                PathUtils::assertIsDirectory($directory);
             }
         );
         $this->addToAssertionCount(1);
@@ -44,7 +44,12 @@ final class AssertIsDirectoryMethodTest extends AbstractTestCase
         $symbolicLink = sys_get_temp_dir() . '/' . uniqid();
         symlink(__DIR__, $symbolicLink);
 
-        $this->assertIsNotDirectory(__FILE__);
+        $this->callPhpObjectMethod(
+            function () use ($symbolicLink): void {
+                PathUtils::assertIsDirectory($symbolicLink);
+            }
+        );
+        $this->addToAssertionCount(1);
     }
 
     public function testSymbolicLinkNotFound(): void
@@ -52,14 +57,14 @@ final class AssertIsDirectoryMethodTest extends AbstractTestCase
         $symbolicLink = sys_get_temp_dir() . '/' . uniqid();
         symlink(__DIR__ . '/foo', $symbolicLink);
 
-        $this->assertIsNotDirectory(__FILE__);
+        $this->assertIsNotDirectory($symbolicLink);
     }
 
     private function assertIsNotDirectory(string $path, string $errorMessage = null): self
     {
         $this->assertExceptionIsThrowned(
             function () use ($path, $errorMessage): void {
-                DirectoryUtils::assertIsDirectory($path, $errorMessage);
+                PathUtils::assertIsDirectory($path, $errorMessage);
             },
             DirectoryNotFoundException::class,
             $errorMessage ?? "Directory \"$path\" not found."
