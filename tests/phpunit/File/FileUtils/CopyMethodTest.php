@@ -28,8 +28,6 @@ final class CopyMethodTest extends AbstractTestCase
 
     public function testSourceNotFound(): void
     {
-        PhpObjectException::setAddPhpErrorToMessage(true);
-
         $source = __FILE__ . '/foo';
         $destination = $this->getTemporaryPath();
 

@@ -8,21 +8,21 @@ class PhpVersionUtils
 {
     public static function is71(): bool
     {
-        return version_compare(PHP_VERSION, '7.1.0', '>=') === true && version_compare(PHP_VERSION, '7.2.0', '<');
+        return PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 1;
     }
 
     public static function is72(): bool
     {
-        return version_compare(PHP_VERSION, '7.2.0', '>=') === true && version_compare(PHP_VERSION, '7.3.0', '<');
+        return PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 2;
     }
 
     public static function is73(): bool
     {
-        return version_compare(PHP_VERSION, '7.3.0', '>=') === true && version_compare(PHP_VERSION, '7.4.0', '<');
+        return PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 3;
     }
 
     public static function is74(): bool
     {
-        return version_compare(PHP_VERSION, '7.4.0', '>=') === true && version_compare(PHP_VERSION, '7.5.0', '<');
+        return PHP_MAJOR_VERSION === 7 && PHP_MINOR_VERSION === 4;
     }
 }

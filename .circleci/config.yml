@@ -136,6 +136,18 @@ jobs:
                   name: PHPUnit with PHP 7.4.0
                   command: bin/test/phpunit-php-7-4
 
+    phpunit-method-test-exists:
+        docker:
+            - image: php:7.4.5-cli-alpine3.11
+        working_directory: /app
+        steps:
+            - checkout
+            - restore_cache:
+                key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
+            - run:
+                name: Assert all methods are tested
+                command: bin/ci/phpUnitMethodTestExists -vvv
+
 workflows:
     version: '2.1'
     CI:
@@ -167,5 +179,8 @@ workflows:
                 requires:
                     - composer
             - phpunit-php-7-4:
+                requires:
+                    - composer
+            - phpunit-method-test-exists:
                 requires:
                     - composer

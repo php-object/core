@@ -9,7 +9,7 @@ use PhpObject\Core\{
     Tests\PhpUnit\Exception\AbstractPhpObjectExceptionTest
 };
 
-class ConstructExceptionTest extends AbstractPhpObjectExceptionTest
+class ConstructMethodTest extends AbstractPhpObjectExceptionTest
 {
     public function testDefaultValues(): void
     {
