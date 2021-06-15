@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace PhpObject\Core\Tests\PhpUnit\Variable\ResourceUtils;
 
-use PhpObject\Core\{Exception\Variable\ResourceExpectedException,
+use PhpObject\Core\{
+    Exception\Variable\ResourceExpectedException,
     Tests\PhpUnit\AbstractTestCase,
     Variable\ResourceUtils,
-    Version\PhpVersionUtils};
+    Version\PhpVersionUtils
+};
 
 final class AssertIsResourceMethodTest extends AbstractTestCase
 {
