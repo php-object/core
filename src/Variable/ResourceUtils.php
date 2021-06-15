@@ -21,7 +21,6 @@ class ResourceUtils
         PhpObjectErrorHandlerManager::enable();
         $return = is_resource($resource);
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }
@@ -55,7 +54,6 @@ class ResourceUtils
         }
 
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }

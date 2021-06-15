@@ -7,13 +7,11 @@ parameters:
         # Too hard to exclude it with ignoreErrors
         - /app/tests/phpunit/TestErrorHandler.php
     ignoreErrors:
-        # I think new static() is a good way to instantiate self in static method.
+        # I think new static() is a good way to instantiate self in static methods.
         # new self() will not take into account child classes.
-        - "#^Unsafe usage of new static().#"
-        # https://github.com/phpstan/phpstan/issues/3232
-        - "#^Result of function rewinddir#"
+        # https://www.php.net/manual/fr/language.oop5.late-static-bindings.php
+        - "#^Unsafe usage of new static#"
 includes:
-    - phar://phpstan.phar/conf/bleedingEdge.neon
     - /root/.composer/vendor/phpstan/phpstan-strict-rules/rules.neon
     - /root/.composer/vendor/phpstan/phpstan-phpunit/extension.neon
     - /root/.composer/vendor/phpstan/phpstan-phpunit/rules.neon

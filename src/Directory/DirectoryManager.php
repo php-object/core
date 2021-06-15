@@ -27,11 +27,11 @@ class DirectoryManager
         if ($context === null) {
             PhpObjectErrorHandlerManager::enable();
             $handle = opendir($path);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         } else {
             PhpObjectErrorHandlerManager::enable();
             $handle = opendir($path, $context);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         }
 
         ResourceUtils::assertIsResource($handle, "Error while opening directory \"$path\".", $lastError);
@@ -90,8 +90,6 @@ class DirectoryManager
         $return = readdir($this->getResource());
         PhpObjectErrorHandlerManager::disable();
 
-        PhpObjectErrorHandlerManager::assertNoError();
-
         return $return === false ? null : $return;
     }
 
@@ -114,9 +112,12 @@ class DirectoryManager
         $this->assertIsOpen();
 
         PhpObjectErrorHandlerManager::enable();
-        /** @var null|false $result */
+        /**
+         * Official PHP documentation indicate void as result type for rewinddir but it's null|false
+         * @var null|false $result
+         */
         $result = rewinddir($this->getResource());
-        $lastError = PhpObjectErrorHandlerManager::disable();
+        $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
 
         if ($result !== null) {
             throw new PhpObjectException('Error while resetting directory handle.', $lastError);
@@ -135,7 +136,6 @@ class DirectoryManager
         PhpObjectErrorHandlerManager::enable();
         closedir($this->getResource());
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $this;
     }

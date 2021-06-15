@@ -5,7 +5,7 @@ COPY docker/phpunit/composer.json /root/.composer/composer.json
 
 RUN \
     apt-get update \
-    # zip is for Composer, git to clone repository and for CircleCI and openssh for CircleCI
+    # zip is for Composer, git to clone repository and for CircleCI and openssh for CircleCI
     && apt-get install -y zip git ssh \
     && composer global update \
     && rm /usr/local/bin/composer

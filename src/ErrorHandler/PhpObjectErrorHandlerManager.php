@@ -8,6 +8,9 @@ use PhpObject\Core\Exception\ErrorHandler\PhpErrorException;
 
 class PhpObjectErrorHandlerManager
 {
+    public const ASSERT_NO_ERROR = true;
+    public const DO_NOT_ASSERT_NO_ERROR = false;
+
     /** @var bool */
     protected static $errorHandledEnabled = false;
 
@@ -34,16 +37,22 @@ class PhpObjectErrorHandlerManager
         static::$errorHandledEnabled = true;
     }
 
-    public static function disable(): ?PhpError
+    public static function disable(bool $assertNoError = true): ?PhpError
     {
         if (static::$errorHandledEnabled === true) {
             restore_error_handler();
             static::$errorHandledEnabled = false;
 
-            return static::getLastError();
+            $return = static::getLastError();
+        } else {
+            $return = null;
         }
 
-        return null;
+        if ($assertNoError === true) {
+            static::assertNoError();
+        }
+
+        return $return;
     }
 
     public static function getLastError(): ?PhpError
