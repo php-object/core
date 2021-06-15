@@ -25,8 +25,6 @@ class PathUtils
             PhpObjectErrorHandlerManager::disable();
         }
 
-        PhpObjectErrorHandlerManager::assertNoError();
-
         return $return;
     }
 
@@ -36,7 +34,6 @@ class PathUtils
         PhpObjectErrorHandlerManager::enable();
         $return = is_dir($path);
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }
@@ -55,8 +52,6 @@ class PathUtils
         PhpObjectErrorHandlerManager::enable();
         $return = is_file($path);
         PhpObjectErrorHandlerManager::disable();
-
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }

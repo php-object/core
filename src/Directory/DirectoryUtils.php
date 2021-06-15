@@ -21,7 +21,7 @@ class DirectoryUtils
 
         PhpObjectErrorHandlerManager::enable();
         $executed = chdir($directory);
-        $lastError = PhpObjectErrorHandlerManager::disable();
+        $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
 
         if ($executed === false) {
             throw new PhpObjectException(
@@ -38,7 +38,7 @@ class DirectoryUtils
     {
         PhpObjectErrorHandlerManager::enable();
         $return = getcwd();
-        $lastError = PhpObjectErrorHandlerManager::disable();
+        $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
 
         if (is_string($return) === false) {
             throw new PhpObjectException(
@@ -59,7 +59,7 @@ class DirectoryUtils
 
         PhpObjectErrorHandlerManager::enable();
         $executed = chroot($directory);
-        $lastError = PhpObjectErrorHandlerManager::disable();
+        $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
 
         if ($executed === false) {
             throw new PhpObjectException(
@@ -77,7 +77,6 @@ class DirectoryUtils
         PhpObjectErrorHandlerManager::enable();
         $return = dirname($directory, $levels);
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }
@@ -99,11 +98,11 @@ class DirectoryUtils
         if ($context === null) {
             PhpObjectErrorHandlerManager::enable();
             $result = rename($source, $destination);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         } else {
             PhpObjectErrorHandlerManager::enable();
             $result = rename($source, $destination, $context);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         }
 
         if ($result !== true) {
@@ -133,11 +132,11 @@ class DirectoryUtils
         if ($context === null) {
             PhpObjectErrorHandlerManager::enable();
             $result = rmdir($directory);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         } else {
             PhpObjectErrorHandlerManager::enable();
             $result = rmdir($directory, $context);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         }
 
         if ($result !== true) {

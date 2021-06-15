@@ -14,7 +14,6 @@ class SymbolicLinkUtils
         PhpObjectErrorHandlerManager::enable();
         $return = is_link($path);
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }

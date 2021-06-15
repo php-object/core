@@ -13,6 +13,7 @@ function validateExitCode() {
             cat "${outputRedirect}"
         fi
         echo -e "\e[41m Error \e[0m"
+        exit 1
     fi
 
     removeOutputRedirectFile
@@ -35,14 +36,18 @@ for param in "$@"; do
     fi
 done
 
-echo -e "\e[32mphpcs\e[0m."
+if [ ${verbosityLevel} -ge 1 ]; then
+    readonly outputRedirect="/dev/stdout"
+fi
+
+echo -e "\e[32mphpcs\e[0m"
 ${rootDirectory}/bin/ci/phpcs > ${outputRedirect} 2>&1
 validateExitCode "$?"
 
 ${rootDirectory}/bin/ci/phpstan
 validateExitCode "$?"
 
-echo -e "\e[32mcomposerRequireChecker\e[0m."
+echo -e "\e[32mcomposerRequireChecker\e[0m"
 ${rootDirectory}/bin/ci/composerRequireChecker > ${outputRedirect} 2>&1
 validateExitCode "$?"
 

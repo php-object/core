@@ -28,7 +28,6 @@ class VariableUtils
         PhpObjectErrorHandlerManager::enable();
         $return = gettype($value);
         PhpObjectErrorHandlerManager::disable();
-        PhpObjectErrorHandlerManager::assertNoError();
 
         return $return;
     }

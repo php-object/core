@@ -24,11 +24,11 @@ class FileUtils
         if (ResourceUtils::isResource($context) === true) {
             PhpObjectErrorHandlerManager::enable();
             $result = copy($source, $destination);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         } else {
             PhpObjectErrorHandlerManager::enable();
             $result = copy($source, $destination);
-            $lastError = PhpObjectErrorHandlerManager::disable();
+            $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
         }
 
         PhpObjectErrorHandlerManager::assertNoError();
