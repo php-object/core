@@ -115,6 +115,25 @@ class FileUtils
         return static::write($filename, $data, $flags, $context);
     }
 
+    public static function getLastAccess(string $filename): \DateTimeImmutable
+    {
+        PathUtils::assertIsFile($filename);
+
+        PhpObjectErrorHandlerManager::enable();
+        $timestamp = fileatime($filename);
+        $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
+        if (is_int($timestamp) === false || $timestamp < 0) {
+            throw new PhpObjectException("Error while getting last access time of file \"$filename\".", $lastError);
+        }
+        PhpObjectErrorHandlerManager::assertNoError();
+
+        PhpObjectErrorHandlerManager::enable();
+        $return = (new \DateTimeImmutable())->setTimestamp($timestamp);
+        PhpObjectErrorHandlerManager::disable();
+
+        return $return;
+    }
+
     /**
      * @param string|array<mixed>|resource $data
      * @param resource|null $context
