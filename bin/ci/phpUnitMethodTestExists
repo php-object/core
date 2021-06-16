@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+set -e
+
+readonly rootDirectory=$(realpath $(dirname $(realpath $0))/../..)
+
+if [ $(which docker || false) ]; then
+    docker \
+        run \
+        -it \
+        --rm \
+        -v ${rootDirectory}:/app:ro \
+        -w /app \
+        --entrypoint /app/bin/ci/phpUnitMethodTestExists \
+        --env PHP_CLI_PARAMETERS="$@" \
+        php:7.4.5-cli-alpine3.11
+else
+    if [ "${1}" != "" ]; then
+        PHP_CLI_PARAMETERS="${1}"
+    fi
+    php tests/ci/PhpUnitMethodTestExists.php ${PHP_CLI_PARAMETERS}
+fi
