@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PhpObject\Core\File;
 
 use PhpObject\Core\{
+    DateTime\DateTimeImmutableUtils,
     Directory\DirectoryUtils,
     ErrorHandler\PhpObjectErrorHandlerManager,
     Exception\PhpObjectException,
@@ -115,23 +116,34 @@ class FileUtils
         return static::write($filename, $data, $flags, $context);
     }
 
-    public static function getLastAccess(string $filename): \DateTimeImmutable
+    public static function getAccessedAt(string $filename): \DateTimeImmutable
     {
         PathUtils::assertIsFile($filename);
 
         PhpObjectErrorHandlerManager::enable();
         $timestamp = fileatime($filename);
         $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
-        if (is_int($timestamp) === false || $timestamp < 0) {
+        if (is_int($timestamp) === false) {
             throw new PhpObjectException("Error while getting last access time of file \"$filename\".", $lastError);
         }
         PhpObjectErrorHandlerManager::assertNoError();
 
-        PhpObjectErrorHandlerManager::enable();
-        $return = (new \DateTimeImmutable())->setTimestamp($timestamp);
-        PhpObjectErrorHandlerManager::disable();
+        return DateTimeImmutableUtils::createFromTimestamp($timestamp);
+    }
 
-        return $return;
+    public static function getInodeUpdatedAt(string $filename): \DateTimeImmutable
+    {
+        PathUtils::assertIsFile($filename);
+
+        PhpObjectErrorHandlerManager::enable();
+        $timestamp = filectime($filename);
+        $lastError = PhpObjectErrorHandlerManager::disable(PhpObjectErrorHandlerManager::DO_NOT_ASSERT_NO_ERROR);
+        if (is_int($timestamp) === false) {
+            throw new PhpObjectException("Error while getting inode change time of file \"$filename\".", $lastError);
+        }
+        PhpObjectErrorHandlerManager::assertNoError();
+
+        return DateTimeImmutableUtils::createFromTimestamp($timestamp);
     }
 
     /**

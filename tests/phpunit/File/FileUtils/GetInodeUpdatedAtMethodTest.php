@@ -10,14 +10,14 @@ use PhpObject\Core\{
     Tests\PhpUnit\AbstractTestCase
 };
 
-final class GetLastAccessMethodTest extends AbstractTestCase
+final class GetInodeUpdatedAtMethodTest extends AbstractTestCase
 {
     public function testFileExists(): void
     {
         /** @var \DateTimeImmutable $lastAccess */
         $lastAccess = $this->callPhpObjectMethod(
             function (): \DateTimeImmutable {
-                return FileUtils::getLastAccess(__FILE__);
+                return FileUtils::getInodeUpdatedAt(__FILE__);
             }
         );
 
@@ -28,7 +28,7 @@ final class GetLastAccessMethodTest extends AbstractTestCase
     {
         $this->assertExceptionIsThrowned(
             function (): void {
-                FileUtils::getLastAccess(__FILE__ . '/foo');
+                FileUtils::getInodeUpdatedAt(__FILE__ . '/foo');
             },
             FileNotFoundException::class,
             'File "' . __FILE__ . '/foo" not found.'
