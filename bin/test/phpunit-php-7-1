@@ -8,12 +8,12 @@ if [ $(which docker || false) ]; then
 
     docker \
         run \
-        -it \
-        --rm \
-        -v ${rootDirectory}:/app:ro \
-        --entrypoint /app/bin/test/phpunit-php-7-1 \
-        --env PHPUNIT_PARAMETERS="${phpunitParameters}" \
-        phpobject/core:phpunit-php-7-1
+            -it \
+            --rm \
+            --volume ${rootDirectory}:/app:ro \
+            --entrypoint /app/bin/test/phpunit-php-7-1 \
+            --env PHPUNIT_PARAMETERS="${phpunitParameters}" \
+            phpobject/core:phpunit-php-7-1
 else
     docker-entrypoint
 fi

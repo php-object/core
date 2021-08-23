@@ -11,8 +11,6 @@ parameters:
         # new self() will not take into account child classes.
         # https://www.php.net/manual/fr/language.oop5.late-static-bindings.php
         - "#^Unsafe usage of new static#"
-        # https://github.com/phpstan/phpstan-src/pull/558
-        - '#^Parameter \#4 \$context of function file_put_contents expects resource, resource\|null given\.$#'
 includes:
     - /root/.composer/vendor/phpstan/phpstan-strict-rules/rules.neon
     - /root/.composer/vendor/phpstan/phpstan-phpunit/extension.neon

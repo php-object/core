@@ -2,4 +2,14 @@
 
 set -eu
 
-docker run -it --user $(id -u):$(id -g) -v $PWD:/app composer:1.9.3 $@
+readonly rootDirectory=$(realpath $(dirname $(realpath $0))/..)
+
+docker \
+    run \
+        -it \
+        -u $(id -u):$(id -g) \
+        -e COMPOSER_HOME=/composer \
+        -v "${rootDirectory}":/app \
+        -v "${rootDirectory}"/var/composer:/composer \
+        composer:1.9.3 \
+        "$@"

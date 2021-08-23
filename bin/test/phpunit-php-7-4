@@ -2,18 +2,33 @@
 
 set -eu
 
+readonly rootDirectory="$(realpath $(dirname $(realpath $0))/../..)"
+readonly hostRootDirPath="${rootDirectory}"/var/ci/hostRootDir.env
+
 if [ $(which docker || false) ]; then
-    readonly rootDirectory="$(realpath $(dirname $(realpath $0))/../..)"
     readonly phpunitParameters="$@"
+
+    echo "HOST_ROOT_DIR=${rootDirectory}" > "${hostRootDirPath}"
 
     docker \
         run \
-        -it \
-        --rm \
-        -v ${rootDirectory}:/app:ro \
-        --entrypoint /app/bin/test/phpunit-php-7-4 \
-        --env PHPUNIT_PARAMETERS="${phpunitParameters}" \
-        phpobject/core:phpunit-php-7-4
+            -it \
+            --rm \
+            --volume ${rootDirectory}:/app \
+            --entrypoint /app/bin/test/phpunit-php-7-4 \
+            --env PHPUNIT_PARAMETERS="--configuration config/ci/phpunit.xml --coverage-html /app/var/ci/phpunit/codeCoverage/html ${phpunitParameters}" \
+            phpobject/core:phpunit-php-7-4
 else
-    docker-entrypoint
+    set +e
+    XDEBUG_MODE=coverage docker-entrypoint
+    readonly exitCode=$?
+    set -e
+
+    # CircleCI doesn't create this file
+    if [ -f "${hostRootDirPath}" ]; then
+        source "${hostRootDirPath}"
+        printf "Open \e[33mfile://${HOST_ROOT_DIR}/var/ci/phpunit/codeCoverage/html/index.html\e[0m in your browser to see code coverage results.\n"
+    fi
+
+    exit ${exitCode}
 fi

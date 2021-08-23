@@ -21,7 +21,7 @@ final class GetInodeUpdatedAtMethodTest extends AbstractTestCase
             }
         );
 
-        static::assertSame(fileatime(__FILE__), $lastAccess->getTimestamp());
+        static::assertSame(filectime(__FILE__), $lastAccess->getTimestamp());
     }
 
     public function testFileNotFound(): void

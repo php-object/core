@@ -1,1 +1,5 @@
+/var/
+!/var/.gitkeep
+!/var/ci/.gitkeep
+!/var/composer/.gitkeep
 /vendor/
