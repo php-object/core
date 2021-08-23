@@ -47,8 +47,8 @@ validateExitCode "$?"
 ${rootDirectory}/bin/ci/phpstan
 validateExitCode "$?"
 
-echo -e "\e[32mcomposerRequireChecker\e[0m"
-${rootDirectory}/bin/ci/composerRequireChecker > ${outputRedirect} 2>&1
+echo -e "\e[32mcomposer-require-checker\e[0m"
+${rootDirectory}/bin/ci/composer-require-checker > ${outputRedirect} 2>&1
 validateExitCode "$?"
 
 ${rootDirectory}/bin/test/phpunit

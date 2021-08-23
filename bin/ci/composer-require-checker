@@ -8,7 +8,7 @@ if [ $(which docker || false) ]; then
         -it \
         --rm \
         -v $(pwd):/app:ro \
-        --entrypoint /app/bin/ci/composerRequireChecker \
+        -e /app/bin/ci/composer-require-checker \
         steevanb/composer-require-checker:2.1.0
 else
     composer-require-checker

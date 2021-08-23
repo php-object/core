@@ -1,6 +1,6 @@
 Under construction ;)
 
-## Documentation to write
+## Documentation to write
 
 PhpObjectException::setAddPhpErrorToMessage()
 

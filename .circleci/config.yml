@@ -28,7 +28,7 @@ jobs:
                 key: vendor-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}-{{ checksum "docker/phpstan/composer.json" }}-{{ checksum "docker/phpunit/composer.json" }}
             - run:
                 name: composer-require-checker
-                command: bin/ci/composerRequireChecker
+                command: bin/ci/composer-require-checker
 
     phpcs:
         docker:

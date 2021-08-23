@@ -7,7 +7,11 @@ RUN \
     # zip is for Composer, git to clone repository and for CircleCI and openssh for CircleCI
     apk add --no-cache zip git openssh \
     && composer global update \
-    && rm /usr/local/bin/composer
+    && rm /usr/local/bin/composer \
+    # install xdebug
+    && apk add --no-cache --virtual .build-deps autoconf make g++ \
+    && pecl install xdebug-3.0.4 \
+    && docker-php-ext-enable xdebug
 
 COPY docker/phpunit/phpunit.xml /phpunit/phpunit.xml
 

@@ -44,13 +44,13 @@ function buildImage() {
     echo -e "Build Docker image \e[32m${dockerImageTag}\e[0m."
     docker \
         build \
-        --force-rm \
-        --tag ${dockerImageTag} \
-        --file ${rootDirectory}/docker/${type}/Dockerfile.${dockerFileExtension} \
-        ${dockerQuietParam} \
-        ${dockerNoCacheParam} \
-        . \
-        > ${outputRedirect} 2>&1
+            --force-rm \
+            --tag ${dockerImageTag} \
+            --file ${rootDirectory}/docker/${type}/Dockerfile.${dockerFileExtension} \
+            ${dockerQuietParam} \
+            ${dockerNoCacheParam} \
+            . \
+            > ${outputRedirect} 2>&1
 }
 
 function pushDockerImage() {
